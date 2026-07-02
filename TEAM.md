@@ -99,7 +99,7 @@ Internal notes for Ritu, Samir, and Samita. Not meant for the supervisor-facing
 
 ## Task Division by File — Full Timeline
 
-| Week | Ritu | Samir | Samita |
+| Week | Person 1 | Person 2 | Person 3 |
 |---|---|---|---|
 | **1 — Setup & Dataset** | `CMakeLists.txt`, `.gitmodules` setup, `tensor.hpp`/`tensor.cpp` skeleton, `dataset.hpp`/`dataset.cpp` loader stub | `scripts/preprocess/download_quickdraw.py` | `scripts/preprocess/pack_dataset.py`; start `gui/canvas.hpp`/`.cpp` window stub |
 | **2 — Forward Pass & UI** | `layers/layer.hpp` (base class), `layers/conv_layer.hpp`/`.cpp` `forward()` | `layers/relu_layer.hpp`, `layers/maxpool_layer.hpp`/`.cpp` `forward()` | `layers/fc_layer.hpp`/`.cpp`, `layers/softmax_layer.hpp`/`.cpp` `forward()`; build out `gui/canvas.cpp` |
