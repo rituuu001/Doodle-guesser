@@ -1,0 +1,6 @@
+[submodule "libraries/raylib"]
+	path = libraries/raylib
+	url = https://github.com/raysan5/raylib.git
+[submodule "libraries/eigen"]
+	path = libraries/eigen
+	url = https://gitlab.com/libeigen/eigen.git

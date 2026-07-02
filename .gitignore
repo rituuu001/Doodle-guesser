@@ -1,0 +1,58 @@
+# =========================
+# Build
+# =========================
+build/
+out/
+bin/
+
+# Visual Studio
+.vs/
+*.VC.db
+*.VC.opendb
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+CTestTestfile.cmake
+
+# Generated project files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Compiled files
+*.obj
+*.o
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.idb
+*.exp
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Dataset
+data/raw/
+data/processed/
+
+# Trained models
+models/*.bin
+models/*.weights
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
