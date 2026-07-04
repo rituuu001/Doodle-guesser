@@ -1,20 +1,25 @@
-#include <Eigen/Dense>
-#include <raylib.h>
+#include "raylib.h"
+#include "gui/canvas.hpp"
 
-int main() {
-    Eigen::Matrix2f m;
-    m << 1, 2,
-        3, 4;
+int main()
+{
+    InitWindow(400, 300, "Canvas Test");
+    Canvas canvas(280, 280, 5);
 
-    InitWindow(400, 300, "Test");
+    while (!WindowShouldClose())
+    {
+        Vector2 pos = GetMousePosition();
+        Vector2 localPos = { pos.x - 10, pos.y - 10 };
+        bool mouseDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+        canvas.handleInput(localPos, mouseDown);
 
-    while (!WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        DrawText("Libraries are working!", 50, 50, 20, BLACK);
+        canvas.draw({ 10, 10 });
         EndDrawing();
     }
 
     CloseWindow();
     return 0;
 }
+  
