@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # OpenCV
 #set the path to your OpenCV build directory
-set(OpenCV_DIR "C:/Users/Rames/opencv/build")
+#set(OpenCV_DIR "C:/Users/Rames/opencv/build")
 find_package(OpenCV REQUIRED)
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
