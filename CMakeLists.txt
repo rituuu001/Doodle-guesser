@@ -20,16 +20,30 @@ add_subdirectory(libraries/raylib)
 # Executable
 add_executable(DoodleGuesser
     main.cpp
+    src/layers/relu_layer.cpp
+    src/layers/maxpool_layer.cpp
 )
 
 # Eigen + OpenCV
 target_include_directories(DoodleGuesser PRIVATE
     libraries/eigen
     ${OpenCV_INCLUDE_DIRS}
+    include
 )
 
 # Link libraries
 target_link_libraries(DoodleGuesser PRIVATE
     raylib
     ${OpenCV_LIBS}
+)
+
+# Test executables
+add_executable(test_relu
+    tests/test_relu.cpp
+    src/layers/maxpool_layer.cpp
+)
+
+target_include_directories(test_relu PRIVATE
+    libraries/eigen
+    include
 )
