@@ -20,10 +20,12 @@ add_subdirectory(libraries/raylib)
 # Executable
 add_executable(DoodleGuesser
     main.cpp
+    src/dataset.cpp
 )
 
 # Eigen + OpenCV
 target_include_directories(DoodleGuesser PRIVATE
+    include
     libraries/eigen
     ${OpenCV_INCLUDE_DIRS}
 )
