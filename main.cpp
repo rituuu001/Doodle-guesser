@@ -1,20 +1,28 @@
-#include <Eigen/Dense>
-#include <raylib.h>
+#include "sketchguesser/dataset.hpp"
+#include <iostream>
 
-int main() {
-    Eigen::Matrix2f m;
-    m << 1, 2,
-        3, 4;
+int main()
+{
+    try
+    {
+        Dataset dataset("data/processed/dataset.bin");
 
-    InitWindow(400, 300, "Test");
+        std::cout << "numImages: " << dataset.numImages() << std::endl;
+        std::cout << "numClasses: " << dataset.numClasses() << std::endl;
 
-    while (!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawText("Libraries are working!", 50, 50, 20, BLACK);
-        EndDrawing();
+        std::cout << "First label: " << static_cast<int>(dataset.getLabel(0)) << std::endl;
+        std::cout << "Last label: " << static_cast<int>(dataset.getLabel(dataset.numImages() - 1)) << std::endl;
+
+        const uint8_t* img = dataset.getImage(0);
+        std::cout << "First image, first 10 pixel values: ";
+        for (int i = 0; i < 10; i++)
+            std::cout << static_cast<int>(img[i]) << " ";
+        std::cout << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
     }
 
-    CloseWindow();
     return 0;
 }
