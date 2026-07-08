@@ -1,5 +1,5 @@
 #pragma once
-
+#include<stdexcept> // for throw std::
 #include<vector>
 class Tensor{
 private:
@@ -22,11 +22,29 @@ public:
   int getWidth() const{
     return width;
   }
-  int getDataSize() const{
+  int size() const{
     return data.size();
   }
- float getPixel(int c,int h,int w) const {
+ float& operator()(int c,int h,int w)  {
+   if(c < 0 || c >= channels ||
+       h < 0 || h >= height ||
+       w < 0 || w >= width)
+    {
+        throw std::out_of_range("Tensor index out of range");
+    }
   int index=c*height*width+h*width+w;
   return data[index];
  }                            
+ const float& operator()(int c,int h,int w) const
+{
+    if(c < 0 || c >= channels ||
+       h < 0 || h >= height ||
+       w < 0 || w >= width)
+    {
+        throw std::out_of_range("Tensor index out of range");
+    }
+
+    int index = c * height * width + h * width + w;
+    return data[index];
+}
 };
