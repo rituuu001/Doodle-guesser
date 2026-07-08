@@ -47,4 +47,15 @@ public:
     int index = c * height * width + h * width + w;
     return data[index];
 }
+// 1D access that can be changed also
+float& operator()(int index)
+{
+    return data[index];
+}
+
+// 1D access that is read only
+const float& operator()(int index) const
+{
+    return data[index];
+}
 };
