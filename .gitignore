@@ -4,6 +4,7 @@
 build/
 out/
 bin/
+pythontest/
 
 # Visual Studio
 .vs/

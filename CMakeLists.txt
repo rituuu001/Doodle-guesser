@@ -21,6 +21,8 @@ add_subdirectory(libraries/raylib)
 add_executable(DoodleGuesser
     main.cpp
     src/dataset.cpp
+    src/layers/fc_layer.cpp
+    src/layers/softmax_layer.cpp
 )
 
 # Eigen + OpenCV
