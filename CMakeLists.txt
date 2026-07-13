@@ -22,10 +22,14 @@ add_executable(DoodleGuesser
     main.cpp
     src/layers/relu_layer.cpp
     src/layers/maxpool_layer.cpp
+    src/dataset.cpp
+    src/layers/fc_layer.cpp
+    src/layers/softmax_layer.cpp
 )
 
 # Eigen + OpenCV
 target_include_directories(DoodleGuesser PRIVATE
+    include
     libraries/eigen
     ${OpenCV_INCLUDE_DIRS}
     include
