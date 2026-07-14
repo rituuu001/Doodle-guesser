@@ -1,22 +1,24 @@
 #pragma once
 #include <vector>
-#include <Eigen/Dense>
+#include"layer.hpp"
+#include"../tensor.hpp"
+#include<algorithm>
 
 struct MaxIndex
 {
     int row,col;
 };
 
-class MaxPoolLayer 
+class MaxPoolLayer : public Layer
 {
 private:
-    std::vector<Eigen::MatrixXf> input_cache;
+    Tensor input_cache;
     std::vector<std::vector<std::vector<MaxIndex>>> max_indices;
 
 public:
-    std::vector<Eigen::MatrixXf> forward(
-        const std::vector<Eigen::MatrixXf>& input);
+    Tensor forward(
+        const Tensor& input) override;
 
-    std::vector<Eigen::MatrixXf> backward(
-        const std::vector<Eigen::MatrixXf>& grad);
+    Tensor backward(
+        const Tensor& grad) override;
 };

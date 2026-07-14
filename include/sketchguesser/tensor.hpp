@@ -8,11 +8,17 @@ private:
  int width;      //same as column      
  std::vector<float> data;  //to flatten the tensor to make it easier to store variable size
                                          // since we can change the size
-public:
  //making a constructor so that every tensor start with a valid state
- Tensor(int c,int h,int w)
-  : channels(c),height(h),width(w),data(c*h*w,0.0f)
-  {}
+ public:
+    // Default constructor
+    Tensor()
+        : channels(0), height(0), width(0), data()
+    {}
+
+    // Constructor with dimensions
+    Tensor(int c, int h, int w)
+        : channels(c), height(h), width(w), data(c * h * w, 0.0f)
+    {}
   int getChannels() const{
     return channels;
   }

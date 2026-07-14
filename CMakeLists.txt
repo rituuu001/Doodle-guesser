@@ -44,7 +44,7 @@ target_link_libraries(DoodleGuesser PRIVATE
 # Test executables
 add_executable(test_relu
     tests/test_relu.cpp
-    src/layers/maxpool_layer.cpp
+    src/layers/relu_layer.cpp
 )
 
 target_include_directories(test_relu PRIVATE

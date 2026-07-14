@@ -1,15 +1,15 @@
 #pragma once
-#include <vector>
-#include <Eigen/Dense>
+#include"layer.hpp"
+#include"../tensor.hpp"
 
-class ReLULayer {
+class ReLULayer :public Layer {
 private:
-    std::vector<Eigen::MatrixXf> input_cache;
+    Tensor input_cache;
 public:
-    std::vector<Eigen::MatrixXf> forward(
-        const::std::vector<Eigen::MatrixXf>& input);
+    Tensor forward(
+        const Tensor& input) override;
     
-    std::vector<Eigen::MatrixXf> backward(
-        const::std::vector<Eigen::MatrixXf>& grad);
+    Tensor backward(
+        const Tensor& grad) override;
 
 };

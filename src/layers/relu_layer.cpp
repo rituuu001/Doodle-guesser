@@ -1,19 +1,26 @@
 #include "sketchguesser/layers/relu_layer.hpp"
+#include<algorithm>
 
-std::vector<Eigen::MatrixXf> ReLULayer::forward(const std::vector<Eigen::MatrixXf>& input)
+Tensor ReLULayer::forward(const Tensor& input)
 {
     input_cache = input;
-    std::vector<Eigen::MatrixXf> output;
-    for(const auto& feature_map : input)
+    Tensor output(input.getChannels(), input.getHeight(), input.getWidth());
+    for(int c=0; c < input.getChannels(); c++)
     {
-        output.push_back(feature_map.cwiseMax(0.0f));
+        for(int h=0; h < input.getHeight(); h++)
+        {
+            for(int w=0; w < input.getWidth(); w++)
+            {
+                float value = input(c, h, w);
+                output(c, h, w) = std::max(0.0f, value);
+            }
+        }
     }
-
     return output;
 }
 
-std::vector<Eigen::MatrixXf> ReLULayer::backward(
-    const std::vector<Eigen::MatrixXf>& grad)
+Tensor ReLULayer::backward(
+    const Tensor& grad)
     {
     //forweek3
     return grad;
