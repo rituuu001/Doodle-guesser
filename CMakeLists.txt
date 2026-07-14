@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # OpenCV
 #set the path to your OpenCV build directory
-set(OpenCV_DIR "C:/Users/Rames/opencv/build")
+#set(OpenCV_DIR "C:/Users/Rames/opencv/build")
 find_package(OpenCV REQUIRED)
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -20,6 +20,8 @@ add_subdirectory(libraries/raylib)
 # Executable
 add_executable(DoodleGuesser
     main.cpp
+    src/layers/relu_layer.cpp
+    src/layers/maxpool_layer.cpp
     src/dataset.cpp
     src/layers/fc_layer.cpp
     src/layers/softmax_layer.cpp
@@ -30,10 +32,22 @@ target_include_directories(DoodleGuesser PRIVATE
     include
     libraries/eigen
     ${OpenCV_INCLUDE_DIRS}
+    include
 )
 
 # Link libraries
 target_link_libraries(DoodleGuesser PRIVATE
     raylib
     ${OpenCV_LIBS}
+)
+
+# Test executables
+add_executable(test_relu
+    tests/test_relu.cpp
+    src/layers/relu_layer.cpp
+)
+
+target_include_directories(test_relu PRIVATE
+    libraries/eigen
+    include
 )
