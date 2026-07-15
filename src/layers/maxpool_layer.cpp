@@ -57,6 +57,24 @@ Tensor MaxPoolLayer::forward(
 Tensor MaxPoolLayer::backward(
     const Tensor& grad)
 {
-    // Week 3 
-    return grad;
+    int num_filters = input_cache.getChannels();
+    int in_rows = input_cache.getHeight();
+    int in_cols = input_cache.getWidth();
+    int grad_rows = grad.getHeight();
+    int grad_cols = grad.getWidth();
+    int grad_filters = grad.getChannels();
+    Tensor output(num_filters, in_rows, in_cols);
+    for(int d=0; d<grad_filters; d++)
+    {
+        for(int r =0 ;r<grad_rows; r++)
+        {
+            for(int c =0; c<grad_cols; c++)
+            {
+                MaxIndex idx = max_indices[d][r][c];
+                output(d, idx.row, idx.col) = grad(d, r, c);
+            }
+        }
+    }
+    
+    return output;
 }
