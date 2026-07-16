@@ -7,12 +7,18 @@
 
 class Convolution : public Layer
 {
-private:
+public:
     int numFilters;
     int kernelSize;
+    Tensor cachedInput;
 
     // Stores each 3×3 filter as a Tensor
     std::vector<Tensor> filters;
+    //biases as vector
+    std::vector<float> biases;
+
+  std::vector<float> dBiases;
+  std::vector<Tensor> dFilters;
 
 public:
     // Constructor
