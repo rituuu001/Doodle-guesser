@@ -31,9 +31,12 @@ target_include_directories(test_fc_gradcheck PRIVATE
 # Executable
 add_executable(DoodleGuesser
     main.cpp
+    src/layers/relu_layer.cpp
+    src/layers/maxpool_layer.cpp
     src/dataset.cpp
     src/layers/fc_layer.cpp
     src/layers/softmax_layer.cpp
+    src/layers/conv_layer.cpp
 )
 
 # Eigen + OpenCV
@@ -41,10 +44,22 @@ target_include_directories(DoodleGuesser PRIVATE
     include
     libraries/eigen
     ${OpenCV_INCLUDE_DIRS}
+    include
 )
 
 # Link libraries
 target_link_libraries(DoodleGuesser PRIVATE
     raylib
     ${OpenCV_LIBS}
+)
+
+# Test executables
+add_executable(test_relu
+    tests/test_relu.cpp
+    src/layers/relu_layer.cpp
+)
+
+target_include_directories(test_relu PRIVATE
+    libraries/eigen
+    include
 )
