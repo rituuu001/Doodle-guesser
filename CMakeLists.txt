@@ -17,6 +17,17 @@ set(RAYLIB_INSTALL OFF CACHE BOOL "" FORCE)
 # raylib
 add_subdirectory(libraries/raylib)
 
+
+add_executable(test_fc_gradcheck
+    tests/test_fc_gradcheck.cpp
+    src/layers/fc_layer.cpp
+)
+
+target_include_directories(test_fc_gradcheck PRIVATE
+    libraries/eigen
+    include
+)
+
 # Executable
 add_executable(DoodleGuesser
     main.cpp
