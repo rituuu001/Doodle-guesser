@@ -49,11 +49,10 @@ Tensor FCLayer::backward(const Tensor& grad)
 
     Eigen::VectorXf dX = weights_.transpose()*eig_grad;
 
-    last_dW = dW;
-    last_dB = dB;
+    dW_ = dW;
+    dB_ = dB;
 
-    weights_ -= learning_rate*dW;
-    bias_ -= learning_rate*dB;
+   
 
     Tensor tensor_output(1,1,input_size);
     for(int i =0; i<input_size;i++)
@@ -61,4 +60,11 @@ Tensor FCLayer::backward(const Tensor& grad)
         tensor_output(i) = dX[i];
     }
     return tensor_output;
+}
+
+void FCLayer::update(double learning_rate)
+{
+    float lr = static_cast<float>(learning_rate);
+    weights_ -= lr * dW_;
+    bias_ -= lr * dB_;
 }

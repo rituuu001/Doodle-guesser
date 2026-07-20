@@ -33,10 +33,14 @@ add_executable(DoodleGuesser
     main.cpp
     src/layers/relu_layer.cpp
     src/layers/maxpool_layer.cpp
-    src/dataset.cpp
     src/layers/fc_layer.cpp
     src/layers/softmax_layer.cpp
     src/layers/conv_layer.cpp
+
+    src/dataset.cpp
+    src/optimizer.cpp
+    src/network.cpp
+
 )
 
 # Eigen + OpenCV

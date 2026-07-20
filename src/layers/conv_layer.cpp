@@ -1,5 +1,5 @@
 #include "sketchguesser/layers/conv_layer.hpp"
-
+#include<Eigen/Dense>
 #include <cstdlib>   // rand(), srand()
 #include <ctime>     // time()
 
@@ -117,4 +117,24 @@ Tensor Convolution::backward(const Tensor& gradient)
 
    
     return dInput;
+}
+
+void Convolution::update(double learning_rate)
+{
+    float lr = static_cast<float>(learning_rate);
+    for (int f = 0; f < numFilters; f++)
+    {
+        Eigen::VectorXf w(filters[f].size());
+        Eigen::VectorXf dw(dFilters[f].size());
+        for (int i = 0; i < filters[f].size(); i++)
+        {
+            w[i] = filters[f](i);
+            dw[i] = dFilters[f](i);
+        }
+        w -= lr * dw;
+        for (int i = 0; i < filters[f].size(); i++)
+            filters[f](i) = w[i];
+
+        biases[f] -= lr * dBiases[f];
+    }
 }
