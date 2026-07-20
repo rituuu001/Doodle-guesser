@@ -7,7 +7,5 @@ public:
     SoftmaxLayer() = default;
 
     Tensor forward(const Tensor& input) override;
-    Tensor backward(const Tensor& gradient){
-        return gradient;
-    };
+    Tensor backward(const Tensor& gradient) override { return gradient; }
 };
