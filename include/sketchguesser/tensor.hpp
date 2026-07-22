@@ -64,4 +64,7 @@ const float& operator()(int index) const
 {
     return data[index];
 }
+
+
+
 };
