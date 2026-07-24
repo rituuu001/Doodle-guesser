@@ -48,3 +48,10 @@ target_link_libraries(DoodleGuesser PRIVATE
     raylib
     ${OpenCV_LIBS}
 )
+
+add_executable(test_dataset
+    tests/test_dataset.cpp
+    src/dataset.cpp
+)
+
+target_include_directories(test_dataset PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
