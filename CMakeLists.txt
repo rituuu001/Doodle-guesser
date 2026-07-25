@@ -57,6 +57,12 @@ target_link_libraries(DoodleGuesser PRIVATE
     ${OpenCV_LIBS}
 )
 
+add_executable(test_dataset
+    tests/test_dataset.cpp
+    src/dataset.cpp
+)
+
+target_include_directories(test_dataset PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # Test executables
 add_executable(test_relu
     tests/test_relu.cpp
