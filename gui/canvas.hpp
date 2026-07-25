@@ -17,10 +17,12 @@
         // Renders the current buffer to screen at the given top-left position
         void draw(Vector2 screenPosition) const;
        
-        // For later (Week 5) — read-only access to the raw buffer
+        
         //const std::vector<unsigned char>& getBuffer() const;
-        int getWidth() const;
-        int getHeight() const;
+        int getWidth() const
+        {return width_;};
+        int getHeight() const
+        {return height_;};
 
     private:
         int width_;

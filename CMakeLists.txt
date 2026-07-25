@@ -19,10 +19,12 @@ add_subdirectory(libraries/raylib)
 
 # Executable
 add_executable(DoodleGuesser
-    main.cpp
+    src/app_main.cpp
     gui/canvas.cpp
+    gui/ui.cpp
 
 )
+
 
 # Eigen + OpenCV
 target_include_directories(DoodleGuesser PRIVATE
