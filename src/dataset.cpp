@@ -1,4 +1,4 @@
-#include "include\sketchguesser/dataset.hpp"
+#include "sketchguesser/dataset.hpp"
 #include <fstream>
 #include <stdexcept>
 #include<cstdint>

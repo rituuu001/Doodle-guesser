@@ -40,6 +40,7 @@ add_executable(DoodleGuesser
     src/dataset.cpp
     src/optimizer.cpp
     src/network.cpp
+    src/preprocessing.cpp
 
 )
 
@@ -49,6 +50,11 @@ target_include_directories(DoodleGuesser PRIVATE
     libraries/eigen
     ${OpenCV_INCLUDE_DIRS}
     include
+)
+add_custom_command(TARGET DoodleGuesser POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${OpenCV_DIR}/x64/vc16/bin/opencv_world4120d.dll
+    $<TARGET_FILE_DIR:DoodleGuesser>
 )
 
 # Link libraries
