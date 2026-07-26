@@ -30,7 +30,10 @@ target_include_directories(test_fc_gradcheck PRIVATE
 
 # Executable
 add_executable(DoodleGuesser
-    main.cpp
+    src/app_main.cpp
+    gui/canvas.cpp
+    gui/ui.cpp
+    
     src/layers/relu_layer.cpp
     src/layers/maxpool_layer.cpp
     src/layers/fc_layer.cpp
@@ -43,6 +46,7 @@ add_executable(DoodleGuesser
     src/preprocessing.cpp
 
 )
+
 
 # Eigen + OpenCV
 target_include_directories(DoodleGuesser PRIVATE
