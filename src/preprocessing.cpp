@@ -2,9 +2,9 @@
 #include<stdexcept>
 #include<opencv2/opencv.hpp>
 
-BoundingBox findBoundingBox(const uint8_t* buffer, int width, int height)
+DoodleGuesser:: BoundingBox DoodleGuesser:: findBoundingBox(const uint8_t* buffer, int width, int height)
 {
-  BoundingBox bb;
+  DoodleGuesser:: BoundingBox bb;
   bb.minX=width;
   bb.maxX=0;
   bb.minY=height;
@@ -29,7 +29,7 @@ BoundingBox findBoundingBox(const uint8_t* buffer, int width, int height)
   return bb;
 }
 
-Tensor preprocess(const uint8_t* buffer, int width, int height)
+Tensor DoodleGuesser:: preprocess(const uint8_t* buffer, int width, int height)
 {
   
   cv::Mat img(height, width, CV_8UC1, const_cast<uint8_t*>(buffer));
@@ -62,5 +62,6 @@ Tensor preprocess(const uint8_t* buffer, int width, int height)
      final(0,row,col)=normalized;
     }
   } 
+  cv::imwrite("C:/projects/Doodle-Guesser/debug_output.png", finalCanvas);
   return final;
 }

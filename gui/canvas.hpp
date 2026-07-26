@@ -17,12 +17,20 @@
         // Renders the current buffer to screen at the given top-left position
         void draw(Vector2 screenPosition) const;
        
-        
-        //const std::vector<unsigned char>& getBuffer() const;
+        const std::vector<unsigned char>& getBuffer() const
+        {
+            return buffer_;
+        }
+
         int getWidth() const
-        {return width_;};
+        {
+            return width_;
+        }
+        
         int getHeight() const
-        {return height_;};
+        {
+            return height_;
+        }
 
     private:
         int width_;

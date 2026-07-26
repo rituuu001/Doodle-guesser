@@ -1,5 +1,6 @@
 #include"ui.hpp"
 #include"canvas.hpp"
+#include"sketchguesser/preprocessing.hpp"
 
 UI::UI()
 {   
@@ -60,7 +61,17 @@ void UI::handleInput(Canvas& canvas)
         {
             canvas.clear();
         }
-        // Predict button: no logic yet, per Task 1 scope
+        
+        else if (CheckCollisionPointRec(mouse, predictButtonRect_))
+        {
+            try
+            {
+            DoodleGuesser::preprocess(canvas.getBuffer().data(), canvas.getWidth(), canvas.getHeight());
+            }
+            catch(const std::runtime_error err)
+            {predictionText_="Draw Something!";}
+
+        }
     }
 }
  
