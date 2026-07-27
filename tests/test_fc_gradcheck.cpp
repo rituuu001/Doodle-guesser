@@ -7,88 +7,91 @@ float computeLoss(FCLayer& fc, const Tensor& input)
 {
     Tensor output = fc.forward(input);
     float sum = 0.0f;
-    for (int i = 0; i < output.size(); i++)
-        sum += output(i);
+    for (size_t i = 0; i < output.getData().size(); i++)
+        sum += output.getData()[i];
     return sum;
 }
 
 int main()
 {
+    std::cout << "=== FC Layer Gradient Check (dW, dB, dX) ===\n";
+
     FCLayer fc(2, 1);
 
     Tensor input(1, 1, 2);
-    input(0) = 1.0f;
-    input(1) = 2.0f;
+    input.getData()[0] = 1.0f;
+    input.getData()[1] = 2.0f;
 
-    // Save ORIGINAL weights/bias before backward() modifies them
-    Eigen::MatrixXf original_weights = fc.getWeights();
-    Eigen::VectorXf original_bias = fc.getBias();
+    // Direct access to mutable weight and bias references
+    Eigen::MatrixXf& weights = fc.getWeightsMutable();
+    Eigen::VectorXf& bias = fc.getBiasMutable();
+
+    Eigen::MatrixXf original_weights = weights;
+    Eigen::VectorXf original_bias = bias;
 
     Tensor output = fc.forward(input);
     Tensor grad(1, 1, 1);
-    grad(0) = 1.0f;
-    Tensor dX_returned = fc.backward(grad);   // this updates weights_/bias_ internally
+    grad.getData()[0] = 1.0f;
+    Tensor dX_returned = fc.backward(grad); // Computes dW_ and dB_ internally
 
-    Eigen::MatrixXf analytical_dW = fc.getLastDW();
-    Eigen::VectorXf analytical_dB = fc.getLastDB();
+    Eigen::MatrixXf analytical_dW = fc.getWeightsGradient();
+    Eigen::VectorXf analytical_dB = fc.getBiasGradient();
 
     float epsilon = 1e-4f;
 
-    // --- Check dW ---
+    // --- Check dW ---c
     for (int i = 0; i < 1; i++) {
         for (int j = 0; j < 2; j++) {
-            fc.setWeight(i, j, original_weights(i, j) + epsilon);
+            weights(i, j) = original_weights(i, j) + epsilon;
             float loss_plus = computeLoss(fc, input);
 
-            fc.setWeight(i, j, original_weights(i, j) - epsilon);
+            weights(i, j) = original_weights(i, j) - epsilon;
             float loss_minus = computeLoss(fc, input);
 
-            fc.setWeight(i, j, original_weights(i, j));  // restore
+            weights(i, j) = original_weights(i, j); // restore
 
-            float numerical = (loss_plus - loss_minus) / (2 * epsilon);
-            std::cout << "W[" << i << "][" << j << "] analytical=" << analytical_dW(i,j)
+            float numerical = (loss_plus - loss_minus) / (2.0f * epsilon);
+            std::cout << "W[" << i << "][" << j << "] analytical=" << analytical_dW(i, j)
                       << " numerical=" << numerical
-                      << " diff=" << std::abs(analytical_dW(i,j) - numerical) << "\n";
+                      << " diff=" << std::abs(analytical_dW(i, j) - numerical) << "\n";
         }
     }
 
     // --- Check dB ---
     for (int i = 0; i < 1; i++) {
-        fc.setBias(i, original_bias(i) + epsilon);
+        bias(i) = original_bias(i) + epsilon;
         float loss_plus = computeLoss(fc, input);
 
-        fc.setBias(i, original_bias(i) - epsilon);
+        bias(i) = original_bias(i) - epsilon;
         float loss_minus = computeLoss(fc, input);
 
-        fc.setBias(i, original_bias(i));  // restore
+        bias(i) = original_bias(i); // restore
 
-        float numerical = (loss_plus - loss_minus) / (2 * epsilon);
+        float numerical = (loss_plus - loss_minus) / (2.0f * epsilon);
         std::cout << "B[" << i << "] analytical=" << analytical_dB(i)
                   << " numerical=" << numerical
                   << " diff=" << std::abs(analytical_dB(i) - numerical) << "\n";
     }
 
-    // --- Restore weights/bias fully to ORIGINAL before checking dX ---
-    for (int i = 0; i < 1; i++)
-        for (int j = 0; j < 2; j++)
-            fc.setWeight(i, j, original_weights(i, j));
-    for (int i = 0; i < 1; i++)
-        fc.setBias(i, original_bias(i));
+    // Restore original weights/bias fully
+    weights = original_weights;
+    bias = original_bias;
 
-    // --- Check dX (now using the SAME weights dX_returned was computed with) ---
+    // --- Check dX ---
     for (int j = 0; j < 2; j++) {
         Tensor input_plus = input;
-        input_plus(j) = input(j) + epsilon;
+        input_plus.getData()[j] = input.getData()[j] + epsilon;
         float loss_plus = computeLoss(fc, input_plus);
 
         Tensor input_minus = input;
-        input_minus(j) = input(j) - epsilon;
+        input_minus.getData()[j] = input.getData()[j] - epsilon;
         float loss_minus = computeLoss(fc, input_minus);
 
-        float numerical = (loss_plus - loss_minus) / (2 * epsilon);
-        std::cout << "X[" << j << "] analytical=" << dX_returned(j)
+        float numerical = (loss_plus - loss_minus) / (2.0f * epsilon);
+        float ana_dx = dX_returned.getData()[j];
+        std::cout << "X[" << j << "] analytical=" << ana_dx
                   << " numerical=" << numerical
-                  << " diff=" << std::abs(dX_returned(j) - numerical) << "\n";
+                  << " diff=" << std::abs(ana_dx - numerical) << "\n";
     }
 
     return 0;

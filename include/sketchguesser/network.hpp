@@ -28,6 +28,11 @@ class Network
         layers.push_back(std::make_unique<FCLayer>(32,6));
         layers.push_back(std::make_unique<SoftmaxLayer>());
     }
+
+    void addLayer(std::unique_ptr<Layer> layer)
+    {
+        layers.push_back(std::move(layer));
+    }
     Tensor forward(const Tensor& input);
     Tensor backward(const Tensor& gradient);
 

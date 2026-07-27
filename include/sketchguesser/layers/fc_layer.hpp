@@ -20,11 +20,14 @@ public:
     Tensor forward(const Tensor& input) override;
     Tensor backward(const Tensor& gradient) override;
 
-    const Eigen::MatrixXf& getDw() const { return dW_; }
-    const Eigen::VectorXf& getDb() const { return dB_; }
+    
+    const Eigen::VectorXf& getBiasGradient() const { return dB_; }
+    const Eigen::MatrixXf& getWeightsGradient() const { return dW_; }
     const Eigen::MatrixXf& getWeights() const { return weights_; }
     const Eigen::VectorXf& getBias() const { return bias_; }
 
+    Eigen::MatrixXf& getWeightsMutable() { return weights_;}
+    Eigen::VectorXf& getBiasMutable() { return bias_;}
     
     void update(double learning_rate) override;
 

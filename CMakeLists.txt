@@ -36,12 +36,13 @@ add_executable(DoodleGuesser
     src/layers/fc_layer.cpp
     src/layers/softmax_layer.cpp
     src/layers/conv_layer.cpp
-
     src/dataset.cpp
     src/optimizer.cpp
     src/network.cpp
+    src/loss.cpp
 
 )
+
 
 # Eigen + OpenCV
 target_include_directories(DoodleGuesser PRIVATE
@@ -55,6 +56,22 @@ target_include_directories(DoodleGuesser PRIVATE
 target_link_libraries(DoodleGuesser PRIVATE
     raylib
     ${OpenCV_LIBS}
+)
+
+add_executable(test_grad_check
+    tests/test_grad_check.cpp
+    src/layers/relu_layer.cpp
+    src/layers/maxpool_layer.cpp
+    src/layers/fc_layer.cpp
+    src/layers/softmax_layer.cpp
+    src/layers/conv_layer.cpp
+    src/network.cpp
+    src/loss.cpp
+)
+
+target_include_directories(test_grad_check PRIVATE
+    libraries/eigen
+    include
 )
 
 add_executable(test_dataset
