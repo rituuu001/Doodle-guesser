@@ -17,15 +17,30 @@ set(RAYLIB_INSTALL OFF CACHE BOOL "" FORCE)
 # raylib
 add_subdirectory(libraries/raylib)
 
+
+add_executable(test_fc_gradcheck
+    tests/test_fc_gradcheck.cpp
+    src/layers/fc_layer.cpp
+)
+
+target_include_directories(test_fc_gradcheck PRIVATE
+    libraries/eigen
+    include
+)
+
 # Executable
 add_executable(DoodleGuesser
     main.cpp
     src/layers/relu_layer.cpp
     src/layers/maxpool_layer.cpp
-    src/dataset.cpp
     src/layers/fc_layer.cpp
     src/layers/softmax_layer.cpp
     src/layers/conv_layer.cpp
+
+    src/dataset.cpp
+    src/optimizer.cpp
+    src/network.cpp
+
 )
 
 # Eigen + OpenCV

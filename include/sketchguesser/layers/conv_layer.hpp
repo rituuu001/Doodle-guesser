@@ -7,12 +7,12 @@
 
 class Convolution : public Layer
 {
-public:
+private:
     int numFilters;
     int kernelSize;
     Tensor cachedInput;
 
-    // Stores each 3×3 filter as a Tensor
+    // Stores each 3x3 filter as a Tensor
     std::vector<Tensor> filters;
     //biases as vector
     std::vector<float> biases;
@@ -27,6 +27,14 @@ public:
     // Forward propagation
     Tensor forward(const Tensor& input) override;
 
-    // Backward propagation (implemented later)
+    // Backward propagation 
     Tensor backward(const Tensor& gradient) override;
+
+    void update(double learning_rate) override;
+
+    //getter functions
+    std::vector<Tensor>& getFilters() { return filters; }
+    std::vector<float>& getBiases() { return biases; }
+    std::vector<Tensor>& getDFilters() { return dFilters; }
+    std::vector<float>& getDBiases() { return dBiases; }
 };
