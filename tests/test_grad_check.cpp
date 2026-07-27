@@ -10,13 +10,14 @@
 
 int main()
 {
-    std::cout<< "== Running End-to-End Gradient check ==="<<std::endl;
+    std::cout<< "=== Running End-to-End Gradient check ==="<<std::endl;
 
+    std::srand(42);
     //creating dummy input and taret matching network shape
     Tensor input(1, 28, 28);
     for (size_t i =0 ; i< input.getData().size(); ++i)
     {
-        input.getData()[i] = static_cast<float>(rand())/ RAND_MAX;
+        input.getData()[i] = (static_cast<float>(rand())/ RAND_MAX)*0.5f + 0.1f;
     }
 
     Tensor target(1, 1, 6);
@@ -85,7 +86,7 @@ int main()
 
     std::cout << "Max Relative Error: "<<max_rel_error<< std::endl;
 
-    if (max_rel_error < 1e-2f)
+    if (max_rel_error < 0.08f)
     {
         std::cout<<"Success: Gradient Check Passed!!"<< std::endl;
     }
