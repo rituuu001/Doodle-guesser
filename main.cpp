@@ -32,7 +32,7 @@ int main()
         return 1;
     }
 
-    std::cout << "dW_ norm before step: " << fc2->getDw().norm() << std::endl;
+    std::cout << "dW_ norm before step: " << fc2->getWeightsGradient().norm() << std::endl;
 
     float beforeNorm = fc2->getWeights().norm();
     std::cout << "Weight matrix norm before step: " << beforeNorm << std::endl;
