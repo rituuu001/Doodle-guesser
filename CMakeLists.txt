@@ -109,4 +109,21 @@ target_include_directories(test_overfit_sample PRIVATE
     libraries/eigen
     include
 )
-# target_link_libraries(test_overfit_sample PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_executable(train_main
+    src/train_main.cpp
+    src/layers/relu_layer.cpp
+    src/layers/maxpool_layer.cpp
+    src/layers/fc_layer.cpp
+    src/layers/softmax_layer.cpp
+    src/layers/conv_layer.cpp
+    src/dataset.cpp
+    src/optimizer.cpp
+    src/network.cpp
+    src/loss.cpp
+)
+
+target_include_directories(train_main PRIVATE
+    include
+    libraries/eigen
+)
