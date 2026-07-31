@@ -18,16 +18,6 @@ set(RAYLIB_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(libraries/raylib)
 
 
-add_executable(test_fc_gradcheck
-    tests/test_fc_gradcheck.cpp
-    src/layers/fc_layer.cpp
-)
-
-target_include_directories(test_fc_gradcheck PRIVATE
-    libraries/eigen
-    include
-)
-
 # Executable
 add_executable(DoodleGuesser
     main.cpp
@@ -74,6 +64,17 @@ target_include_directories(test_grad_check PRIVATE
     include
 )
 
+add_executable(test_fc_gradcheck
+    tests/test_fc_gradcheck.cpp
+    src/layers/fc_layer.cpp
+)
+
+target_include_directories(test_fc_gradcheck PRIVATE
+    libraries/eigen
+    include
+)
+
+
 add_executable(test_dataset
     tests/test_dataset.cpp
     src/dataset.cpp
@@ -92,3 +93,20 @@ target_include_directories(test_relu PRIVATE
     include
 )
 
+add_executable(test_overfit_sample
+    tests/test_overfit_sample.cpp
+    src/layers/relu_layer.cpp
+    src/layers/maxpool_layer.cpp
+    src/layers/fc_layer.cpp
+    src/layers/softmax_layer.cpp
+    src/layers/conv_layer.cpp
+    src/optimizer.cpp
+    src/network.cpp
+    src/loss.cpp
+)
+
+target_include_directories(test_overfit_sample PRIVATE
+    libraries/eigen
+    include
+)
+# target_link_libraries(test_overfit_sample PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
