@@ -127,3 +127,4 @@ target_include_directories(train_main PRIVATE
     include
     libraries/eigen
 )
+# target_link_libraries(test_overfit_sample PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
