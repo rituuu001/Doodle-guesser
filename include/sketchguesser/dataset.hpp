@@ -30,3 +30,9 @@ private:
     int    numClasses_ = 0;
 };
 
+struct DatasetSplit{
+    std::vector<size_t> trainIndices;
+    std::vector<size_t> valIndices;
+};
+
+DatasetSplit splitDataset(size_t totalImages, float trainRatio = 0.8f);

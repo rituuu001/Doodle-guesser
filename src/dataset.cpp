@@ -1,7 +1,11 @@
-#include "sketchguesser/dataset.hpp"
+#include "../include/sketchguesser/dataset.hpp"
 #include <fstream>
 #include <stdexcept>
 #include<cstdint>
+#include<iostream>
+#include<numeric>
+#include<random>
+#include<algorithm>
 
 Dataset::Dataset(const std::string& path) {
     load(path);
@@ -53,3 +57,21 @@ void Dataset::load(const std::string& path)
     {
         return (*(labels_.data()+index));
     }
+
+DatasetSplit splitDataset(size_t totalImages, float trainRatio)
+{
+    std::vector<size_t> indices(totalImages);
+    std::iota(indices.begin(), indices.end(),0);
+
+    std::mt19937 rng(42);
+    std::shuffle(indices.begin(), indices.end(), rng);
+
+    size_t trainSize = static_cast<size_t>(totalImages * trainRatio);
+
+    DatasetSplit split;
+    split.trainIndices.assign(indices.begin(), indices.begin() + trainSize);
+    split.valIndices.assign(indices.begin() + trainSize, indices.end());
+    
+    std::cout<<"[Split Complete] Train :"<<split.trainIndices.size()<<" |Val: "<<split.valIndices.size()<<std::endl;
+    return split;
+}

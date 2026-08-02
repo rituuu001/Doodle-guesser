@@ -9,8 +9,7 @@ Tensor MaxPoolLayer::forward(
         int in_cols = input.getWidth();
         int out_rows = in_rows / 2;
         int out_cols = in_cols / 2;
-        Tensor output(
-            num_filters, out_rows, out_cols);
+        Tensor output(num_filters, out_rows, out_cols);
         max_indices.resize(num_filters, std::vector<std::vector<MaxIndex>>(out_rows, std::vector<MaxIndex>(out_cols)));
         for(int d=0; d<num_filters; d++)
         {
@@ -54,16 +53,21 @@ Tensor MaxPoolLayer::forward(
     }
 
 
-Tensor MaxPoolLayer::backward(
-    const Tensor& grad)
+Tensor MaxPoolLayer::backward(const Tensor& grad)
 {
     int num_filters = input_cache.getChannels();
     int in_rows = input_cache.getHeight();
     int in_cols = input_cache.getWidth();
+
     int grad_rows = grad.getHeight();
     int grad_cols = grad.getWidth();
     int grad_filters = grad.getChannels();
     Tensor output(num_filters, in_rows, in_cols);
+
+    for(int i =0; i<output.size(); ++i)
+    {
+        output(i) = 0.0f;
+    }
     for(int d=0; d<grad_filters; d++)
     {
         for(int r =0 ;r<grad_rows; r++)
@@ -71,7 +75,7 @@ Tensor MaxPoolLayer::backward(
             for(int c =0; c<grad_cols; c++)
             {
                 MaxIndex idx = max_indices[d][r][c];
-                output(d, idx.row, idx.col) = grad(d, r, c);
+                output(d, idx.row, idx.col) += grad(d, r, c);
             }
         }
     }

@@ -43,6 +43,8 @@ Convolution::Convolution(int numFilters, int kernelSize)
 Tensor Convolution::forward(const Tensor& input)
 {
     // Get input dimensions
+    int inChannels = input.getChannels();
+    
     int inputHeight = input.getHeight();
     int inputWidth = input.getWidth();
     cachedInput = input;
@@ -62,18 +64,18 @@ Tensor Convolution::forward(const Tensor& input)
             for (int col = 0; col < outputWidth; col++)
             {
                 float sum = 0.0f;
-
-                // Perform cross-correlation
-                for (int i = 0; i < kernelSize; i++)
+                for(int ch =0; ch < inChannels; ch++)
                 {
-                    for (int j = 0; j < kernelSize; j++)
-                    {   
-                        sum += input(0, row + i, col + j)
-                             * filters[f](0, i, j);
+                    for (int i = 0; i < kernelSize; i++)
+                    {
+                        for (int j = 0; j < kernelSize; j++)
+                        {
+                            sum += input(ch, row + i, col + j)
+                                 * filters[f](ch, i, j);
+                        }
                     }
                 }
                 sum += biases[f];
-                // Store the computed value
                 output(f, row, col) = sum;
             }
         }
@@ -85,34 +87,53 @@ Tensor Convolution::forward(const Tensor& input)
 
 Tensor Convolution::backward(const Tensor& gradient)
 {
+    int inChannels = cachedInput.getChannels();
+    int inH = cachedInput.getHeight();
+    int inw = cachedInput.getWidth();
+
     dBiases = std::vector<float>(numFilters, 0.0f);
     dFilters.clear();
+
     Tensor dInput(cachedInput.getChannels(),cachedInput.getHeight(),cachedInput.getWidth());
-
+    for (int i = 0; i< dInput.size(); i++)
+    {
+        dInput(i) = 0.0f;
+    }
     for (int f = 0; f < numFilters; f++)
-    {   //accumulator of dL/dK
-        dFilters.push_back(Tensor(1, kernelSize, kernelSize));
-
-        for (int y = 0; y < gradient.getHeight(); y++)
         {
-            for (int x = 0; x < gradient.getWidth(); x++)
+            Tensor df(inChannels, kernelSize, kernelSize);
+            for (int i = 0; i < df.size(); i++) {
+                df(i) = 0.0f;
+            }
+            dFilters.push_back(df);
+        }
+
+        // 3. Accumulate gradients
+        for (int f = 0; f < numFilters; f++)
+        {
+            for (int y = 0; y < gradient.getHeight(); y++)
             {
-                dBiases[f] += gradient(f, y, x);
-                
-                for(int row=0;row<kernelSize;row++)
+                for (int x = 0; x < gradient.getWidth(); x++)
                 {
-                    for (int col=0;col<kernelSize;col++)
+                    float g = gradient(f, y, x);
+                    dBiases[f] += g;
+
+                    for (int ch = 0; ch < inChannels; ch++)
                     {
-                        dFilters[f](0,row,col)+=gradient(f,y,x)*cachedInput(0,y+row,x+col);
-                        dInput(0,y+row,x+col)+=gradient(f,y,x)*filters[f](0,row,col);
-
+                        for (int row = 0; row < kernelSize; row++)
+                        {
+                            for (int col = 0; col < kernelSize; col++)
+                            {
+                                dFilters[f](ch, row, col) += g * cachedInput(ch, y + row, x + col);
+                                dInput(ch, y + row, x + col) += g * filters[f](ch, row, col);
+                            }
+                        }
                     }
-
                 }
-
             }
         }
-       
+
+        return dInput;
     }
 
    
