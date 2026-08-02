@@ -46,9 +46,8 @@ __pycache__/
 data/raw/
 data/processed/
 
-# Trained models
-models/*.bin
-models/*.weights
+# Training logs
+docs/training_log.csv
 
 # IDE
 .vscode/

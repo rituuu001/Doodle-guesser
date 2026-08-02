@@ -9,7 +9,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # OpenCV
 # ======================================================
 
-set(OpenCV_DIR "C:/Users/Rames/opencv/build")
 find_package(OpenCV REQUIRED)
 
 # ======================================================
