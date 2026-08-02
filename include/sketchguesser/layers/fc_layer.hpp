@@ -1,15 +1,21 @@
 #pragma once
+
 #include "layer.hpp"
 #include "../tensor.hpp"
 #include <Eigen/Dense>
 
-class FCLayer : public Layer {
+class FCLayer : public Layer
+{
 private:
     Tensor input_cache;
     int input_size;
     int output_size;
-    Eigen::MatrixXf weights_;  // (output_size x input_size)
-    Eigen::VectorXf bias_;     // (output_size)
+
+    Eigen::MatrixXf weights_;   // (output_size x input_size)
+    Eigen::VectorXf bias_;      // (output_size)
+
+    Eigen::MatrixXf dW_;
+    Eigen::VectorXf dB_;
 
     Eigen::MatrixXf dW_;
     Eigen::VectorXf dB_;

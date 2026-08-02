@@ -66,6 +66,37 @@ Tensor FCLayer::backward(const Tensor& grad)
 
     return tensor_output;
 }
+Tensor FCLayer::backward(const Tensor& grad)
+{
+    Eigen::VectorXf eig_grad(output_size);
+    for(int i=0; i<output_size; i++)
+    {
+        eig_grad[i]= grad(i);
+    }
+    
+    Eigen::VectorXf eig_inputcache(input_size);
+    for(int i=0; i<input_size; i++)
+    {
+        eig_inputcache[i] = input_cache(i);
+    }
+
+    Eigen::MatrixXf dW = eig_grad* eig_inputcache.transpose();
+    Eigen::VectorXf dB = eig_grad;
+
+    Eigen::VectorXf dX = weights_.transpose()*eig_grad;
+
+    dW_ = dW;
+    dB_ = dB;
+
+   
+
+    Tensor tensor_output(1,1,input_size);
+    for(int i =0; i<input_size;i++)
+    {
+        tensor_output(i) = dX[i];
+    }
+    return tensor_output;
+}
 
 void FCLayer::update(double learning_rate)
 {
