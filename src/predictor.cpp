@@ -32,8 +32,8 @@ std::string Predictor::predict(const uint8_t* buffer,int width,int height)
         "cup",
         "donut",
         "envelope",
-        "guitar",
         "house",
+        "guitar",
         "pants"
     };
 
