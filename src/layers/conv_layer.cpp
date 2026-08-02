@@ -136,9 +136,6 @@ Tensor Convolution::backward(const Tensor& gradient)
         return dInput;
     }
 
-   
-    return dInput;
-}
 
 void Convolution::update(double learning_rate)
 {

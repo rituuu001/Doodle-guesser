@@ -4,12 +4,15 @@
 #include<algorithm>
 #include<random>
 #include<iomanip>
+#include <fstream>
 
-#include "../include/sketchguesser/dataset.hpp"
-#include "../include/sketchguesser/loss.hpp"
-#include "../include/sketchguesser/tensor.hpp"
-#include "../include/sketchguesser/optimizer.hpp"
-#include "../include/sketchguesser/network.hpp"
+#include "sketchguesser/dataset.hpp"
+#include "sketchguesser/loss.hpp"
+#include "sketchguesser/tensor.hpp"
+#include "sketchguesser/optimizer.hpp"
+#include "sketchguesser/network.hpp"
+#include "sketchguesser/serializer.hpp"
+
 
 Tensor prepareInputTensor(const uint8_t* raw_pixels)
 {
@@ -31,94 +34,165 @@ Tensor prepareTargetTensor(uint8_t label, int num_classes)
     return target;
 }
 
-int main(int argc, char** argv)
+struct EpochMetrics
 {
-    std::cout<<"\n Task 4 : Small subset training run \n";
+    float loss = 0.0f;
+    float accuracy = 0.0f;
+};
 
-    std::string dataset_path = "data/dataset.bin";
-    if (argc > 1)
+enum class Mode
+{
+    Train,
+    Validation
+};
+
+EpochMetrics runEpoch(
+    Network& net,
+    Dataset& dataset,
+    CrossEntropyLoss& loss_func,
+    Optimizer* optimizer,
+    const std::vector<size_t>& indices,
+    int num_classes,
+    Mode mode)
+{
+    EpochMetrics metrics;
+
+    float epoch_loss = 0.0f;
+    int correct_predictions = 0;
+
+    for(size_t idx : indices)
     {
-        dataset_path = argv[1];
+        const uint8_t* raw_img = dataset.getImage(idx);
+        uint8_t true_label = dataset.getLabel(idx);
+
+        Tensor input = prepareInputTensor(raw_img);
+        Tensor target = prepareTargetTensor(true_label, num_classes);
+
+        // Forward Pass
+        Tensor output = net.forward(input);
+
+        float loss = loss_func.forward(output, target);
+        epoch_loss += loss;
+
+        // Accuracy
+        int predicted_class = 0;
+        float max_prob = output(0);
+
+        for(int c = 1; c < num_classes; c++)
+        {
+            if(output(c) > max_prob)
+            {
+                max_prob = output(c);
+                predicted_class = c;
+            }
+        }
+
+        if(predicted_class == true_label)
+            correct_predictions++;
+
+        // Training only
+        if(mode == Mode::Train)
+        {
+            Tensor grad_loss = loss_func.backward(output, target);
+            net.backward(grad_loss);
+            optimizer->step(net.getLayers());
+        }
     }
+
+    metrics.loss =epoch_loss/indices.size();
+    metrics.accuracy =100.0f * correct_predictions /indices.size();
+    return metrics;
+}
+
+int main()
+{
+    std::ofstream logFile("../docs/training_log.csv");
+
+    if(!logFile.is_open())
+   {
+    std::cerr << "Could not create training log.\n";
+    return 1;
+   }
+
+    logFile << "Epoch,Train Loss,Train Accuracy,Validation Loss,Validation Accuracy\n";
+    std::string dataset_path = "../data/processed/dataset.bin";
+    
 
     std::cout<<"Loading dataset from: "<<dataset_path<<"...\n"<<std::endl;
     Dataset dataset(dataset_path);
 
-    size_t total_available = dataset.numImages();
+    size_t total = dataset.numImages();
     int num_classes = dataset.numClasses();
 
-    std::cout << "total dataset images : "<<total_available<<"\n";
+    std::cout << "total dataset images : "<<total<<"\n";
     std::cout<<" number of classes: "<<num_classes<<"\n\n";
 
-    size_t subset_size = std::min<size_t> (100, total_available);
-    int epochs = 10;
+    int epochs = 30;
     float learning_rate = 0.01f;
+    float bestValidationAccuracy = 0.0f;
 
-    std::cout << "--- Training Setup ---\n";
-    std::cout << "Subset size: " << subset_size << " samples\n";
-    std::cout << "Epochs:      " << epochs << "\n";
-    std::cout << "Learning Rate: " << learning_rate << "\n";
-    std::cout << "----------------------\n\n";
+    std::cout << "Training Setup"<<std::endl;
+    std::cout << "Epochs: " <<epochs<<std::endl;
+    std::cout << "Learning Rate: " <<learning_rate<<std::endl;
+   
 
     Network net;
     CrossEntropyLoss loss_func;
     Optimizer optimizer(learning_rate);
 
-    std::vector<size_t> indices(subset_size);
-    std::iota(indices.begin(), indices.end(), 0);
-
     std::default_random_engine rng(42);
 
-    for (int epoch = 1; epoch <= epochs; ++epoch) {
-        std::shuffle(indices.begin(), indices.end(), rng);
+    std::vector<size_t> indices(total);
+    std::iota(indices.begin(), indices.end(), 0);
 
-        float epoch_loss = 0.0f;
-        int correct_predictions = 0;
+    std::shuffle(indices.begin(), indices.end(), rng);
 
-        for (size_t idx : indices) {
-            const uint8_t* raw_img = dataset.getImage(idx);
-            uint8_t true_label = dataset.getLabel(idx);
+    size_t trainSize = static_cast<size_t>(0.8 * total);
 
-            Tensor input = prepareInputTensor(raw_img);
-            Tensor target = prepareTargetTensor(true_label, num_classes);
+    std::vector<size_t> trainIndices(indices.begin(),indices.begin() + trainSize);
+    std::vector<size_t> valIndices(indices.begin() + trainSize,indices.end());
 
-            // 1. Forward Pass
-            Tensor output = net.forward(input);
-            float loss_val = loss_func.forward(output, target);
-            epoch_loss += loss_val;
+for(int epoch = 1; epoch <= epochs; epoch++)
+{  
+    //training loop
+    EpochMetrics trainMetrics = runEpoch(net,dataset,loss_func, &optimizer,
+                                         trainIndices,num_classes,Mode::Train);
 
-            // Argmax calculation for accuracy
-            int predicted_class = 0;
-            float max_prob = output(0);
-            for (int c = 1; c < num_classes; ++c) {
-                if (output(c) > max_prob) {
-                    max_prob = output(c);
-                    predicted_class = c;
-                }
-            }
-            if (predicted_class == true_label) {
-                correct_predictions++;
-            }
+    //validation loop
+    EpochMetrics validationMetrics =runEpoch(net,dataset,loss_func,nullptr,
+                                         valIndices,num_classes,Mode::Validation);
+    
+    //displays the loss and accuracy of training and validation loop every epoch                                    
+    std::cout << "Epoch "<<epoch<<"/"<<epochs<<std::endl;
+    std::cout <<std::fixed<<std::setprecision(4);
 
-            // 2. Backward Pass
-            Tensor grad_loss = loss_func.backward(output, target);
-            net.backward(grad_loss);
+    std::cout <<"Train Loss : "<<trainMetrics.loss<< std::endl;
+    std::cout << "Train Acc  : "<<trainMetrics.accuracy<<"%"<<std::endl;
 
-            // 3. Optimizer Step
-            optimizer.step(net.getLayers());
-        }
+    std::cout << "Val Loss   : "<<validationMetrics.loss<<std::endl;
+    std::cout << "Val Acc    : "<<validationMetrics.accuracy<< "%"<<std::endl;
+    
+    //writes the loss and accuracy in training_log.csv
+    logFile
+    << epoch << ","
+    << trainMetrics.loss << ","
+    << trainMetrics.accuracy << ","
+    << validationMetrics.loss << ","
+    << validationMetrics.accuracy
+    << "\n";
 
-        float avg_loss = epoch_loss / subset_size;
-        float accuracy = (static_cast<float>(correct_predictions) / subset_size) * 100.0f;
 
-        std::cout << "Epoch [" << std::setw(2) << epoch << "/" << epochs << "] "
-                  << "| Avg Loss: " << std::fixed << std::setprecision(4) << avg_loss << " "
-                  << "| Accuracy: " << std::setprecision(2) << accuracy << "%\n";
-    }
+    //saves the model with highest accuracy
+    if(validationMetrics.accuracy > bestValidationAccuracy)
+{
+    bestValidationAccuracy = validationMetrics.accuracy;
 
-    std::cout << "\n=========================================\n";
-    std::cout << "   Small-Subset Run Complete!            \n";
-    std::cout << "=========================================\n";
+    Serializer::save(net, "../models/doodle_model.bin");
 
-    return 0;
+    std::cout << "New best model saved!\n";
+}
+        
+}   
+logFile.close();
+return 0;
 }

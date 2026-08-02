@@ -17,8 +17,6 @@ private:
     Eigen::MatrixXf dW_;
     Eigen::VectorXf dB_;
 
-    Eigen::MatrixXf dW_;
-    Eigen::VectorXf dB_;
 
 public:
     FCLayer(int input_size, int output_size);

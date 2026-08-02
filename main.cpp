@@ -1,10 +1,7 @@
-
-#include "sketchguesser/network.hpp"
+#include <vector>
+#include <cstdint>
 #include <iostream>
-
-#include "sketchguesser/optimizer.hpp"
-#include "sketchguesser/layers/fc_layer.hpp"
-
+#include "sketchguesser/preprocessing.hpp"
 
 int main()
 {
@@ -49,3 +46,4 @@ int main()
 
     return 0;
 }
+  
