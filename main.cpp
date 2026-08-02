@@ -5,33 +5,44 @@
 
 int main()
 {
-    const int width = 336;
-    const int height = 336;
+    Network net;
+    Optimizer opt(0.01);
 
-    // Blank canvas, all background (0)
-    std::vector<uint8_t> buffer(width * height, 0);
+    Tensor input(1, 28, 28);
+    for (int h = 0; h < 28; h++)
+        for (int w = 0; w < 28; w++)
+            input(0, h, w) = 0.5f;
 
-    for (int y = 100; y <= 160; y++)
+    Tensor output = net.forward(input);
+
+    Tensor fakeGradient(1, 1, 6);
+    for (int i = 0; i < 6; i++)
+        fakeGradient(i) = 0.1f;
+
+    net.backward(fakeGradient);
+
+    FCLayer* fc2 = dynamic_cast<FCLayer*>(net.getLayers()[5].get());
+
+    if (!fc2)
     {
-        for (int x = 10; x <= 310; x++)
-        {
-            buffer[x + y * width] = 255;
-        }
+        std::cout << "Cast failed - not an FCLayer at index 5" << std::endl;
+        return 1;
     }
 
-    std::cout << "Running preprocess() on synthetic 336x336 buffer with a WIDE rectangle at "
-                 "x:[10,310] (301px wide), y:[100,160] (61px tall)\n";
-    std::cout << "Expected bounding box: minX=10, maxX=310, minY=100, maxY=160\n";
-    std::cout << "Width is the larger dimension -> after resize, width should be ~28, "
-                 "height should be noticeably smaller than 28 (padded top/bottom)\n";
+    std::cout << "dW_ norm before step: " << fc2->getWeightsGradient().norm() << std::endl;
 
-    Tensor result = preprocess(buffer.data(), width, height);
+    float beforeNorm = fc2->getWeights().norm();
+    std::cout << "Weight matrix norm before step: " << beforeNorm << std::endl;
 
-    std::cout << "Tensor produced: channels=" << result.getChannels()
-              << " height=" << result.getHeight()
-              << " width=" << result.getWidth() << "\n";
-    std::cout << "Check debug_output.png (written inside preprocess(), if you added "
-                 "the temporary cv::imwrite line) to visually verify centering.\n";
+    opt.step(net.getLayers());
+
+    float afterNorm = fc2->getWeights().norm();
+    std::cout << "Weight matrix norm after step: " << afterNorm << std::endl;
+
+    if (beforeNorm != afterNorm)
+        std::cout << "PASS: weights changed" << std::endl;
+    else
+        std::cout << "FAIL: weights did not change" << std::endl;
 
     return 0;
 }

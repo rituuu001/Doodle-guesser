@@ -18,16 +18,6 @@ set(RAYLIB_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(libraries/raylib)
 
 
-add_executable(test_fc_gradcheck
-    tests/test_fc_gradcheck.cpp
-    src/layers/fc_layer.cpp
-)
-
-target_include_directories(test_fc_gradcheck PRIVATE
-    libraries/eigen
-    include
-)
-
 # Executable
 add_executable(DoodleGuesser
     src/app_main.cpp
@@ -39,10 +29,10 @@ add_executable(DoodleGuesser
     src/layers/fc_layer.cpp
     src/layers/softmax_layer.cpp
     src/layers/conv_layer.cpp
-
     src/dataset.cpp
     src/optimizer.cpp
     src/network.cpp
+    src/loss.cpp
     src/preprocessing.cpp
 
 )
@@ -67,12 +57,40 @@ target_link_libraries(DoodleGuesser PRIVATE
     ${OpenCV_LIBS}
 )
 
+add_executable(test_grad_check
+    tests/test_grad_check.cpp
+    src/layers/relu_layer.cpp
+    src/layers/maxpool_layer.cpp
+    src/layers/fc_layer.cpp
+    src/layers/softmax_layer.cpp
+    src/layers/conv_layer.cpp
+    src/network.cpp
+    src/loss.cpp
+)
+
+target_include_directories(test_grad_check PRIVATE
+    libraries/eigen
+    include
+)
+
+add_executable(test_fc_gradcheck
+    tests/test_fc_gradcheck.cpp
+    src/layers/fc_layer.cpp
+)
+
+target_include_directories(test_fc_gradcheck PRIVATE
+    libraries/eigen
+    include
+)
+
+
 add_executable(test_dataset
     tests/test_dataset.cpp
     src/dataset.cpp
 )
 
 target_include_directories(test_dataset PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
 # Test executables
 add_executable(test_relu
     tests/test_relu.cpp
@@ -83,3 +101,39 @@ target_include_directories(test_relu PRIVATE
     libraries/eigen
     include
 )
+
+add_executable(test_overfit_sample
+    tests/test_overfit_sample.cpp
+    src/layers/relu_layer.cpp
+    src/layers/maxpool_layer.cpp
+    src/layers/fc_layer.cpp
+    src/layers/softmax_layer.cpp
+    src/layers/conv_layer.cpp
+    src/optimizer.cpp
+    src/network.cpp
+    src/loss.cpp
+)
+
+target_include_directories(test_overfit_sample PRIVATE
+    libraries/eigen
+    include
+)
+
+add_executable(train_main
+    src/train_main.cpp
+    src/layers/relu_layer.cpp
+    src/layers/maxpool_layer.cpp
+    src/layers/fc_layer.cpp
+    src/layers/softmax_layer.cpp
+    src/layers/conv_layer.cpp
+    src/dataset.cpp
+    src/optimizer.cpp
+    src/network.cpp
+    src/loss.cpp
+)
+
+target_include_directories(train_main PRIVATE
+    include
+    libraries/eigen
+)
+# target_link_libraries(test_overfit_sample PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

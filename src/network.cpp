@@ -1,6 +1,6 @@
 #include"sketchguesser/network.hpp"
 
-
+#include"sketchguesser/tensor.hpp"
 Tensor Network::forward(const Tensor& input)
 {
       Tensor in=input;
