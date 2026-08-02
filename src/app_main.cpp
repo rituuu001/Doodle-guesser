@@ -1,15 +1,24 @@
 #include <raylib.h>
 #include "../gui/canvas.hpp"
 #include "../gui/ui.hpp"
+#include "sketchguesser/predictor.hpp"
 
 
 int main()
 {
     InitWindow(850, 750, "Sketch Guesser - Test");
     SetTargetFPS(60);
+    
+     Predictor predictor;
+
+    if(!predictor.loadModel("../models/doodle_model.bin"))
+    {
+        std::cerr << "Could not load model\n";
+        return 1;
+    }
 
     Canvas canvas(336, 336, 6);
-    UI ui;  // safe: constructed after InitWindow, so GPU context exists
+    UI ui(predictor);
 
     Vector2 canvasScreenPos = { 250, 150 };
 

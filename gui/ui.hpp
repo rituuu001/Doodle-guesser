@@ -3,12 +3,14 @@
 #include <string>
 #include "canvas.hpp"
 
-const Color MUSTARD = { 244, 180, 0, 255 };
+#include "sketchguesser/predictor.hpp"
 
+const Color MUSTARD = { 244, 180, 0, 255 };
+class Predictor; 
 class UI
 {
 public:
-    UI();
+    UI(Predictor& predictor);
     ~UI();
 
     void draw() const;
@@ -22,5 +24,6 @@ private:
     std::string predictionText_;
     Font fontTitle,fontBody;
     Texture2D predictIcon,clearIcon,logoIcon;
-    
+
+    Predictor& predictor_;
 };

@@ -2,7 +2,7 @@
 #include"canvas.hpp"
 #include"sketchguesser/preprocessing.hpp"
 
-UI::UI()
+UI::UI(Predictor& predictor): predictor_(predictor)
 {   
     canvasBorderRect_={250, 150, 336, 336};
     predictButtonRect_={200, 600, 200, 50};
@@ -11,12 +11,12 @@ UI::UI()
 
     predictionText_="Prediction:-";
 
-    predictIcon = LoadTexture("gui/assets/icons/predict.png");
-    clearIcon = LoadTexture("gui/assets/icons/clear.png");
-    logoIcon = LoadTexture("gui/assets/icons/logo.png");
+    predictIcon = LoadTexture("../gui/assets/icons/predict.png");
+    clearIcon = LoadTexture("../gui/assets/icons/clear.png");
+    logoIcon = LoadTexture("../gui/assets/icons/logo.png");
 
-    fontBody=LoadFontEx("gui/assets/fonts/PlusJakartaSans-Regular.ttf", 40, nullptr, 0);
-    fontTitle=LoadFontEx("gui/assets/fonts/Manrope-ExtraBold.ttf", 60, nullptr, 0);
+    fontBody=LoadFontEx("../gui/assets/fonts/PlusJakartaSans-Regular.ttf", 40, nullptr, 0);
+    fontTitle=LoadFontEx("../gui/assets/fonts/Manrope-ExtraBold.ttf", 60, nullptr, 0);
 }
 
 UI::~UI()
@@ -66,7 +66,8 @@ void UI::handleInput(Canvas& canvas)
         {
             try
             {
-            DoodleGuesser::preprocess(canvas.getBuffer().data(), canvas.getWidth(), canvas.getHeight());
+            predictionText_ = predictor_.predict(canvas.getBuffer().data(),canvas.getWidth(),canvas.getHeight());
+            
             }
             catch(const std::runtime_error err)
             {predictionText_="Draw Something!";}

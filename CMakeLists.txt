@@ -87,6 +87,7 @@ target_link_libraries(train PRIVATE
 
 add_executable(predict
     src/app_main.cpp
+    src/predictor.cpp
     gui/canvas.cpp
     gui/ui.cpp
     src/preprocessing.cpp

@@ -62,6 +62,6 @@ Tensor DoodleGuesser:: preprocess(const uint8_t* buffer, int width, int height)
      final(0,row,col)=normalized;
     }
   } 
-  cv::imwrite("C:/projects/Doodle-Guesser/debug_output.png", finalCanvas);
+ 
   return final;
 }
