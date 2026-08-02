@@ -36,7 +36,8 @@ class Network
     Tensor forward(const Tensor& input);
     Tensor backward(const Tensor& gradient);
 
-    std::vector<std::unique_ptr<Layer>>& getLayers() { return layers; }
+    const std::vector<std::unique_ptr<Layer>>& getLayers()const { return layers; }
+    std::vector<std::unique_ptr<Layer>>& getLayers(){ return layers; }
 
 
 };

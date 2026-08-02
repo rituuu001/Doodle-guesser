@@ -38,6 +38,7 @@ set(CNN_SOURCES
     src/dataset.cpp
     src/optimizer.cpp
     src/loss.cpp
+    src/serializer.cpp
 )
 
 # ======================================================

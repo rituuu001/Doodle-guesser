@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 
+
 // Helper: Save/Load standard Tensor
 static void writeTensor(std::ofstream& out, const Tensor& tensor) {
     int c = tensor.getChannels();
@@ -159,8 +160,8 @@ bool Serializer::load(Network& net, const std::string& filepath) {
         // Handle Fully Connected Layer
         auto fc = dynamic_cast<FCLayer*>(layer.get());
         if (fc) {
-            if (!readEigenMatrix(in, fc->getWeights())) return false;
-            if (!readEigenVector(in, fc->getBias())) return false;
+            if (!readEigenMatrix(in, fc->getWeightsMutable())) return false;
+            if (!readEigenVector(in, fc->getBiasMutable())) return false;
             continue;
         }
     }

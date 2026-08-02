@@ -4,12 +4,15 @@
 #include<algorithm>
 #include<random>
 #include<iomanip>
+#include <fstream>
 
-#include "../include/sketchguesser/dataset.hpp"
-#include "../include/sketchguesser/loss.hpp"
-#include "../include/sketchguesser/tensor.hpp"
-#include "../include/sketchguesser/optimizer.hpp"
-#include "../include/sketchguesser/network.hpp"
+#include "sketchguesser/dataset.hpp"
+#include "sketchguesser/loss.hpp"
+#include "sketchguesser/tensor.hpp"
+#include "sketchguesser/optimizer.hpp"
+#include "sketchguesser/network.hpp"
+#include "sketchguesser/serializer.hpp"
+
 
 Tensor prepareInputTensor(const uint8_t* raw_pixels)
 {
@@ -103,7 +106,15 @@ EpochMetrics runEpoch(
 
 int main()
 {
-   
+    std::ofstream logFile("../docs/training_log.csv");
+
+    if(!logFile.is_open())
+   {
+    std::cerr << "Could not create training log.\n";
+    return 1;
+   }
+
+    logFile << "Epoch,Train Loss,Train Accuracy,Validation Loss,Validation Accuracy\n";
     std::string dataset_path = "../data/processed/dataset.bin";
     
 
@@ -116,8 +127,9 @@ int main()
     std::cout << "total dataset images : "<<total<<"\n";
     std::cout<<" number of classes: "<<num_classes<<"\n\n";
 
-    int epochs = 10;
+    int epochs = 30;
     float learning_rate = 0.01f;
+    float bestValidationAccuracy = 0.0f;
 
     std::cout << "Training Setup"<<std::endl;
     std::cout << "Epochs: " <<epochs<<std::endl;
@@ -142,12 +154,15 @@ int main()
 
 for(int epoch = 1; epoch <= epochs; epoch++)
 {  
+    //training loop
     EpochMetrics trainMetrics = runEpoch(net,dataset,loss_func, &optimizer,
                                          trainIndices,num_classes,Mode::Train);
 
+    //validation loop
     EpochMetrics validationMetrics =runEpoch(net,dataset,loss_func,nullptr,
-                                         trainIndices,num_classes,Mode::Validation);
-       
+                                         valIndices,num_classes,Mode::Validation);
+    
+    //displays the loss and accuracy of training and validation loop every epoch                                    
     std::cout << "Epoch "<<epoch<<"/"<<epochs<<std::endl;
     std::cout <<std::fixed<<std::setprecision(4);
 
@@ -156,6 +171,28 @@ for(int epoch = 1; epoch <= epochs; epoch++)
 
     std::cout << "Val Loss   : "<<validationMetrics.loss<<std::endl;
     std::cout << "Val Acc    : "<<validationMetrics.accuracy<< "%"<<std::endl;
-        }
-    return 0;
+    
+    //writes the loss and accuracy in training_log.csv
+    logFile
+    << epoch << ","
+    << trainMetrics.loss << ","
+    << trainMetrics.accuracy << ","
+    << validationMetrics.loss << ","
+    << validationMetrics.accuracy
+    << "\n";
+
+
+    //saves the model with highest accuracy
+    if(validationMetrics.accuracy > bestValidationAccuracy)
+{
+    bestValidationAccuracy = validationMetrics.accuracy;
+
+    Serializer::save(net, "../models/doodle_model.bin");
+
+    std::cout << "New best model saved!\n";
+}
+        
+}   
+logFile.close();
+return 0;
 }
