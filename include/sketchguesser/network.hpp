@@ -1,17 +1,18 @@
+
 #pragma once
-
-#include"layers/layer.hpp"
-#include"layers/conv_layer.hpp"
-#include"layers/fc_layer.hpp"
-#include"layers/maxpool_layer.hpp"
-#include"layers/relu_layer.hpp"
-#include"layers/softmax_layer.hpp"
-
 #include"tensor.hpp"
 
 #include<vector>
 #include<iostream>
 #include<memory>
+#include "tensor.hpp"
+#include "layers/layer.hpp"
+#include "layers/conv_layer.hpp"
+#include "layers/relu_layer.hpp"
+#include "layers/maxpool_layer.hpp"
+#include "layers/fc_layer.hpp"
+#include "layers/softmax_layer.hpp"
+
 
 class Network
 {
@@ -32,6 +33,11 @@ class Network
     Tensor backward(const Tensor& gradient);
 
     std::vector<std::unique_ptr<Layer>>& getLayers() { return layers; }
+   
 
+const std::vector<std::unique_ptr<Layer>>& getLayers() const
+{
+    return layers;
+}
 
 };
