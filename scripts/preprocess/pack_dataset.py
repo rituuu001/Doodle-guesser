@@ -34,12 +34,12 @@ def pack_binary():
     print(f"\nTotal images: {all_images.shape}")
 
     with open(OUTPUT_PATH, "wb") as f:
-        f.write(np.int32(len(all_labels)).tobytes())
-        f.write(np.int32(len(CATEGORIES)).tobytes())
+        f.write(np.int32(len(all_labels)).tobytes())#8 byte header
+        f.write(np.int32(len(CATEGORIES)).tobytes())#8 byte header
         
         for img, label in zip(all_images, all_labels):
-            f.write(img.astype(np.uint8).tobytes())
-            f.write(np.uint8(label).tobytes())
+            f.write(img.astype(np.uint8).tobytes())#writes pixel byte
+            f.write(np.uint8(label).tobytes())#writes one label per byte
     
     print(f"Saved to {OUTPUT_PATH}")
 

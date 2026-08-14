@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <cstdint>// uint8_t and uint32_t
 #include <string>
 #include <vector>
 
@@ -13,7 +13,8 @@ public:
     
     //prevents compiler from converting string path to full dataset object
     explicit Dataset(const std::string& path);
-
+    
+    //getter methods
     size_t numImages() const;
     int numClasses() const;
 
@@ -21,6 +22,7 @@ public:
     uint8_t getLabel(size_t index) const;
 
 private:
+    //Reads and parses the custom packed binary format
     void load(const std::string& path);
 
     std::vector<uint8_t> images_;
@@ -30,9 +32,3 @@ private:
     int    numClasses_ = 0;
 };
 
-struct DatasetSplit{
-    std::vector<size_t> trainIndices;
-    std::vector<size_t> valIndices;
-};
-
-DatasetSplit splitDataset(size_t totalImages, float trainRatio = 0.8f);

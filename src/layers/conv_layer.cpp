@@ -1,5 +1,5 @@
 #include "sketchguesser/layers/conv_layer.hpp"
-#include<Eigen/Dense>
+
 #include <cstdlib>   // rand(), srand()
 #include <ctime>     // time()
 
@@ -17,17 +17,17 @@ Convolution::Convolution(int numFilters, int kernelSize)
     }
 
     // Create each filter
-    for (int f = 0; f < numFilters; f++)
+    for (int f=0; f<numFilters; f++)
     {
-        Tensor filter(1, kernelSize, kernelSize);
+        Tensor filter(1,kernelSize,kernelSize);
 
         // Fill filter with random values between -1 and 1
-        for (int i = 0; i < kernelSize; i++)
+        for (int i=0; i<kernelSize; i++)
         {
-            for (int j = 0; j < kernelSize; j++)
+            for (int j=0; j<kernelSize; j++)
             {
-                filter(0, i, j) =
-                    (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
+                filter(0,i,j) =
+                    (static_cast<float>(std::rand())/RAND_MAX)*2.0f - 1.0f;
             }
         }
 
@@ -49,29 +49,28 @@ Tensor Convolution::forward(const Tensor& input)
     int inputWidth = input.getWidth();
     cachedInput = input;
     // Calculate output dimensions
-    int outputHeight = inputHeight - kernelSize + 1;
-    int outputWidth = inputWidth - kernelSize + 1;
+    int outputHeight = inputHeight-kernelSize + 1;
+    int outputWidth = inputWidth-kernelSize + 1;
 
     // Output tensor
     Tensor output(numFilters, outputHeight, outputWidth);
 
     // Apply every filter
-    for (int f = 0; f < numFilters; f++)
+    for (int f=0; f<numFilters; f++)
     {
         // Slide the filter across the input
-        for (int row = 0; row < outputHeight; row++)
+        for (int row=0; row<outputHeight; row++)
         {
-            for (int col = 0; col < outputWidth; col++)
+            for (int col=0; col<outputWidth; col++)
             {
-                float sum = 0.0f;
-                for(int ch =0; ch < inChannels; ch++)
+                float sum=0.0f;
+                for(int ch=0; ch<inChannels; ch++)
                 {
-                    for (int i = 0; i < kernelSize; i++)
+                    for (int i=0; i<kernelSize; i++)
                     {
-                        for (int j = 0; j < kernelSize; j++)
+                        for (int j=0; j<kernelSize; j++)
                         {
-                            sum += input(ch, row + i, col + j)
-                                 * filters[f](ch, i, j);
+                            sum += input(ch, row+i, col+j)* filters[f](ch, i, j);
                         }
                     }
                 }
@@ -92,23 +91,23 @@ Tensor Convolution::backward(const Tensor& gradient)
     int inw = cachedInput.getWidth();
 
     dBiases = std::vector<float>(numFilters, 0.0f);
-    dFilters.clear();
+    dFilters.clear();//sets the vector size to 0
 
     Tensor dInput(cachedInput.getChannels(),cachedInput.getHeight(),cachedInput.getWidth());
     for (int i = 0; i< dInput.size(); i++)
     {
-        dInput(i) = 0.0f;
+        dInput[i] = 0.0f;
     }
     for (int f = 0; f < numFilters; f++)
         {
             Tensor df(inChannels, kernelSize, kernelSize);
             for (int i = 0; i < df.size(); i++) {
-                df(i) = 0.0f;
+                df[i] = 0.0f;
             }
             dFilters.push_back(df);
         }
 
-        // 3. Accumulate gradients
+        //  Accumulate gradients
         for (int f = 0; f < numFilters; f++)
         {
             for (int y = 0; y < gradient.getHeight(); y++)
@@ -137,13 +136,13 @@ Tensor Convolution::backward(const Tensor& gradient)
     }
 
 
-void Convolution::update(double learning_rate)
+void Convolution::update(float learning_rate)
 {
-    float lr = static_cast<float>(learning_rate);
+    float lr =learning_rate;
     for (int f = 0; f < numFilters; f++)
     {
         for (int i = 0; i < filters[f].size(); i++)
-            filters[f](i) -= lr * dFilters[f](i);
+            filters[f][i] -= lr * dFilters[f][i];
 
         biases[f] -= lr * dBiases[f];
     }

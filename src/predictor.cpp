@@ -16,13 +16,13 @@ std::string Predictor::predict(const uint8_t* buffer,int width,int height)
     Tensor output = network.forward(input);
 
     int predicted = 0;
-    float maxProb = output(0);
+    float maxProb = output[0];
 
     for(int i = 1; i < 6; i++)
     {
-        if(output(i) > maxProb)
+        if(output[i] > maxProb)
         {
-            maxProb = output(i);
+            maxProb = output[i];
             predicted = i;
         }
     }

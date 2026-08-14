@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # ======================================================
 # OpenCV
 # ======================================================
-
 find_package(OpenCV REQUIRED)
 
 # ======================================================
@@ -35,7 +34,6 @@ set(CNN_SOURCES
 
     src/network.cpp
     src/dataset.cpp
-    src/optimizer.cpp
     src/loss.cpp
     src/serializer.cpp
 )
@@ -68,17 +66,6 @@ target_link_libraries(train PRIVATE
     cnn
 )
 
-# ======================================================
-# EVALUATE
-# ======================================================
-
-#add_executable(evaluate
- #   src/evaluate_main.cpp
-#)
-
-#target_link_libraries(evaluate PRIVATE
-   # cnn
-#)*/
 
 # ======================================================
 # PREDICT GUI

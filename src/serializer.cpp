@@ -16,7 +16,7 @@ static void writeTensor(std::ofstream& out, const Tensor& tensor) {
     out.write(reinterpret_cast<const char*>(&w), sizeof(int));
 
     for (int i = 0; i < tensor.size(); ++i) {
-        float val = tensor(i);
+        float val = tensor[i];
         out.write(reinterpret_cast<const char*>(&val), sizeof(float));
     }
 }
@@ -35,7 +35,7 @@ static bool readTensor(std::ifstream& in, Tensor& tensor) {
     for (int i = 0; i < tensor.size(); ++i) {
         float val;
         in.read(reinterpret_cast<char*>(&val), sizeof(float));
-        tensor(i) = val;
+        tensor[i] = val;
     }
     return in.good();
 }

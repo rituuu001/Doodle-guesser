@@ -7,10 +7,21 @@ Tensor MaxPoolLayer::forward(
         int num_filters = input.getChannels();
         int in_rows = input.getHeight();
         int in_cols = input.getWidth();
-        int out_rows = in_rows / 2;
-        int out_cols = in_cols / 2;
+        int out_rows = in_rows/2;
+        int out_cols = in_cols/2;
         Tensor output(num_filters, out_rows, out_cols);
-        max_indices.resize(num_filters, std::vector<std::vector<MaxIndex>>(out_rows, std::vector<MaxIndex>(out_cols)));
+        
+        //resize all 3 levels of the nested vector
+        max_indices.resize(num_filters);
+        for (int d = 0; d < num_filters; d++)
+        {
+           max_indices[d].resize(out_rows);
+           for (int r = 0; r < out_rows; r++)
+           {
+              max_indices[d][r].resize(out_cols);
+            }
+        }
+
         for(int d=0; d<num_filters; d++)
         {
             for(int r =0; r<out_rows; r++)
@@ -19,7 +30,8 @@ Tensor MaxPoolLayer::forward(
                 {
                     int sr = 2 * r;
                     int sc = 2 * c;
-
+                    
+                    //find the max of the 4 input pixels
                     float max_val = input(d, sr, sc);
                     int max_r = sr;
                     int max_c = sc;
@@ -66,16 +78,17 @@ Tensor MaxPoolLayer::backward(const Tensor& grad)
 
     for(int i =0; i<output.size(); ++i)
     {
-        output(i) = 0.0f;
+        output[i] = 0.0f;
     }
     for(int d=0; d<grad_filters; d++)
     {
-        for(int r =0 ;r<grad_rows; r++)
+        for(int r=0 ;r<grad_rows; r++)
         {
-            for(int c =0; c<grad_cols; c++)
+            for(int c=0; c<grad_cols; c++)
             {
                 MaxIndex idx = max_indices[d][r][c];
-                output(d, idx.row, idx.col) += grad(d, r, c);
+                //stores the gradient to the coordinate having the max value
+                output(d, idx.row, idx.col)= grad(d, r, c);
             }
         }
     }

@@ -8,7 +8,8 @@ public:
     virtual Tensor forward(const Tensor& input) = 0;
     virtual Tensor backward(const Tensor& gradient)=0;
     
-    virtual void update(double learning_rate) {}
+    // updates weights and biases
+    virtual void update(float learning_rate) {}
 
-   virtual ~Layer() = default;
+    virtual ~Layer() = default;
 };

@@ -1,16 +1,16 @@
 #pragma once
 
 #include"layers/layer.hpp"
-#include<memory>
+#include<memory>//unique_ptr
 #include<vector>
 
-class Optimizer
+class Optimizer//SGD for now
 {
     private:
-    double learningRate;
+    float learningRate;
 
     public:
-    Optimizer(double lr):learningRate(lr){}
+    Optimizer(float lr):learningRate(lr){}
     void step(std::vector<std::unique_ptr<Layer>>& layers)
     {
         for (auto& layer : layers)

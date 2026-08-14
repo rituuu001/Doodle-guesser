@@ -5,7 +5,7 @@ Tensor SoftmaxLayer::forward(const Tensor& tensor_input) {
     int size = tensor_input.size();
     Eigen::VectorXf eig_input(size);
     for (int i = 0; i < size; i++) {
-        eig_input[i] = tensor_input(i);
+        eig_input[i] = tensor_input[i];
     }
 
     float max = eig_input.maxCoeff();
@@ -18,7 +18,7 @@ Tensor SoftmaxLayer::forward(const Tensor& tensor_input) {
 
     Tensor tensor_output(1, 1, size);
     for (int i = 0; i < size; i++) {
-        tensor_output(i) = eig_output[i];
+        tensor_output[i] = eig_output[i];
     }
     return tensor_output;
 }
@@ -27,7 +27,7 @@ Tensor SoftmaxLayer::backward(const Tensor& grad_output) {
     int size = grad_output.size();
     Eigen::VectorXf g(size);
     for (int i = 0; i < size; i++) {
-        g[i] = grad_output(i);
+        g[i] = grad_output[i];
     }
 
     // Jacobian computation: dx_i = p_i * (g_i - sum(g * p))
@@ -36,7 +36,7 @@ Tensor SoftmaxLayer::backward(const Tensor& grad_output) {
 
     Tensor grad_input(1, 1, size);
     for (int i = 0; i < size; i++) {
-        grad_input(i) = grad_input_eig[i];
+        grad_input[i] = grad_input_eig[i];
     }
     return grad_input;
 }

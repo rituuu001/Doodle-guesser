@@ -24,36 +24,38 @@ Tensor FCLayer::forward(const Tensor& tensor_input)
     }
 
     input_cache = tensor_input;
-
+    //copy input tensor to eigen vector
     Eigen::VectorXf eig_input(input_size);
     for (int i = 0; i < input_size; i++) {
-        eig_input[i] = tensor_input(i);
+        eig_input[i] = tensor_input[i];
     }
 
     Eigen::VectorXf eig_output = weights_ * eig_input + bias_;
-    
+    //copy output eigen vector to tensor and flattening
     Tensor tensor_output(1, 1, output_size);
     for (int i = 0; i < output_size; i++) {
-        tensor_output(i) = eig_output[i];
+        tensor_output[i] = eig_output[i];
     }
 
     return tensor_output;
 }
 
 Tensor FCLayer::backward(const Tensor& grad)
-{
+{   
+    // copy gradient tensor to eigen vector
     Eigen::VectorXf eig_grad(output_size);
     for (int i = 0; i < output_size; i++) {
-        eig_grad[i] = grad(i);
+        eig_grad[i] = grad[i];
     }
     
+    //copy input tensor to eigen vector
     Eigen::VectorXf eig_inputcache(input_size);
     for (int i = 0; i < input_size; i++) {
-        eig_inputcache[i] = input_cache(i);
+        eig_inputcache[i] = input_cache[i];
     }
 
     // Gradient calculations
-    dW_ = eig_grad * eig_inputcache.transpose();
+    dW_ = eig_grad*eig_inputcache.transpose();
     dB_ = eig_grad;
 
     // Gradient with respect to input (dX)
@@ -61,16 +63,15 @@ Tensor FCLayer::backward(const Tensor& grad)
 
     Tensor tensor_output(1, 1, input_size);
     for (int i = 0; i < input_size; i++) {
-        tensor_output(i) = dX[i];
+        tensor_output[i] = dX[i];
     }
 
     return tensor_output;
 }
 
-
-void FCLayer::update(double learning_rate)
-{
-    float lr = static_cast<float>(learning_rate);
+void FCLayer::update(float learning_rate)
+{   
+    float lr= learning_rate;
     weights_ -= lr * dW_;
     bias_ -= lr * dB_;
 }

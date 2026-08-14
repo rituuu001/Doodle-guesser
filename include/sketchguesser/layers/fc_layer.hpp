@@ -33,6 +33,6 @@ public:
     Eigen::MatrixXf& getWeightsMutable() { return weights_;}
     Eigen::VectorXf& getBiasMutable() { return bias_;}
     
-    void update(double learning_rate) override;
+    void update(float learning_rate) override;
 
 };

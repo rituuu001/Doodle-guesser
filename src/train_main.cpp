@@ -19,7 +19,7 @@ Tensor prepareInputTensor(const uint8_t* raw_pixels)
     Tensor input(1, Dataset::imageHeight, Dataset::imageWidth);
     for(size_t i =0; i < Dataset::imageSize; ++i)
     {
-        input(i) = static_cast<float>(raw_pixels[i]) / 255.0f;
+        input[i] = static_cast<float>(raw_pixels[i]) / 255.0f;
     }
     return input;
 }
@@ -29,7 +29,7 @@ Tensor prepareTargetTensor(uint8_t label, int num_classes)
     Tensor target(1, 1, num_classes);
     for(int i =0; i <num_classes; ++i)
     {
-        target(i) = (i == label) ? 1.0f : 0.0f;
+        target[i] = (i == label) ? 1.0f : 0.0f;
     }
     return target;
 }
@@ -76,13 +76,13 @@ EpochMetrics runEpoch(
 
         // Accuracy
         int predicted_class = 0;
-        float max_prob = output(0);
+        float max_prob = output[0];
 
         for(int c = 1; c < num_classes; c++)
         {
-            if(output(c) > max_prob)
+            if(output[c] > max_prob)
             {
-                max_prob = output(c);
+                max_prob = output[c];
                 predicted_class = c;
             }
         }
@@ -153,7 +153,9 @@ int main()
     std::vector<size_t> valIndices(indices.begin() + trainSize,indices.end());
 
 for(int epoch = 1; epoch <= epochs; epoch++)
-{  
+{   
+    std::shuffle( trainIndices.begin(),trainIndices.end(),rng);
+    
     //training loop
     EpochMetrics trainMetrics = runEpoch(net,dataset,loss_func, &optimizer,
                                          trainIndices,num_classes,Mode::Train);

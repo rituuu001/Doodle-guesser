@@ -11,6 +11,8 @@ private:
  //making a constructor so that every tensor start with a valid state
  public:
     float& operator[](size_t idx){return data[idx];}
+    
+    //read only
     const float& operator[](size_t idx) const { return data[idx];}
 
     std::vector<float>& getData() { return data;}
@@ -58,15 +60,5 @@ private:
       int index = c * height * width + h * width + w;
       return data[index];
   }
-  // 1D access that can be changed also
-  float& operator()(int index)
-  {
-      return data[index];
-  }
-
-  // 1D access that is read only
-  const float& operator()(int index) const
-  {
-      return data[index];
-  }
+  
 };

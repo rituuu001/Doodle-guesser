@@ -11,6 +11,4 @@ public:
 
     Tensor forward(const Tensor& input) override;
     Tensor backward(const Tensor& gradient) override;
-
-    void update(double learning_rate) override {}
 };

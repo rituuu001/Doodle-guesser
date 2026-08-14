@@ -6,14 +6,14 @@
 
 int main()
 {
-    InitWindow(850, 750, "Sketch Guesser - Test");
+    InitWindow(850, 750, "Sketch Guesser");
     SetTargetFPS(60);
     
      Predictor predictor;
 
     if(!predictor.loadModel("../models/doodle_model.bin"))
     {
-        std::cerr << "Could not load model\n";
+        std::cerr << "Could not load model";
         return 1;
     }
 
