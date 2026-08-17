@@ -85,88 +85,76 @@ static bool readEigenVector(std::ifstream& in, Eigen::VectorXf& vec) {
 
 bool Serializer::save(const Network& net, const std::string& filepath) {
     std::ofstream out(filepath, std::ios::binary);
-    if (!out.is_open()) {
-        std::cerr << "[Serializer Error] Could not open file for writing: " << filepath << std::endl;
-        return false;
-    }
+    if (!out.is_open()) return false;
 
-    uint32_t magic = 0x534E5731; 
-    out.write(reinterpret_cast<const char*>(&magic), sizeof(magic));
+    uint32_t magic = 0x534E5731; // Unique binary header
+    save_bytes(out, &magic);
 
     for (const auto& layer : net.getLayers()) {
-        // Handle Convolution Layer
-        auto conv = dynamic_cast<Convolution*>(layer.get());
-        if (conv) {
-            auto& filters = conv->getFilters();
-            int num_filters = filters.size();
-            out.write(reinterpret_cast<const char*>(&num_filters), sizeof(int));
-            for (const auto& filter : filters) {
-                writeTensor(out, filter);
+        if (auto conv = dynamic_cast<Convolution*>(layer.get())) {
+            int num_filters = conv->getFilters().size();
+            save_bytes(out, &num_filters);
+            
+            for (const auto& filter : conv->getFilters()) {
+                int c = filter.getChannels(), h = filter.getHeight(), w = filter.getWidth();
+                save_bytes(out, &c); save_bytes(out, &h); save_bytes(out, &w);
+                for (int i = 0; i < filter.size(); ++i) {
+                    float val = filter(i);
+                    save_bytes(out, &val);
+                }
             }
 
-            auto& biases = conv->getBiases();
-            int num_biases = biases.size();
-            out.write(reinterpret_cast<const char*>(&num_biases), sizeof(int));
-            out.write(reinterpret_cast<const char*>(biases.data()), num_biases * sizeof(float));
-            continue;
-        }
+            int num_biases = conv->getBiases().size();
+            save_bytes(out, &num_biases);
+            save_bytes(out, conv->getBiases().data(), num_biases);
+        } 
+        else if (auto fc = dynamic_cast<FCLayer*>(layer.get())) {
+            int rows = fc->getWeights().rows(), cols = fc->getWeights().cols();
+            save_bytes(out, &rows); save_bytes(out, &cols);
+            save_bytes(out, fc->getWeights().data(), rows * cols);
 
-        // Handle Fully Connected Layer
-        auto fc = dynamic_cast<FCLayer*>(layer.get());
-        if (fc) {
-            writeEigenMatrix(out, fc->getWeights());
-            writeEigenVector(out, fc->getBias());
-            continue;
+            int b_size = fc->getBias().size();
+            save_bytes(out, &b_size);
+            save_bytes(out, fc->getBias().data(), b_size);
         }
     }
-
-    out.close();
-    std::cout << "[Serializer] Successfully saved weights to " << filepath << std::endl;
     return true;
 }
 
 bool Serializer::load(Network& net, const std::string& filepath) {
     std::ifstream in(filepath, std::ios::binary);
-    if (!in.is_open()) {
-        std::cerr << "[Serializer Error] Could not open file for reading: " << filepath << std::endl;
-        return false;
-    }
+    if (!in.is_open()) return false;
 
     uint32_t magic = 0;
-    in.read(reinterpret_cast<char*>(&magic), sizeof(magic));
-    if (magic != 0x534E5731) {
-        std::cerr << "[Serializer Error] Invalid binary format!" << std::endl;
-        return false;
-    }
+    load_bytes(in, &magic);
+    if (magic != 0x534E5731) return false;
 
     for (auto& layer : net.getLayers()) {
-        // Handle Convolution Layer
-        auto conv = dynamic_cast<Convolution*>(layer.get());
-        if (conv) {
+        if (auto conv = dynamic_cast<Convolution*>(layer.get())) {
             int num_filters;
-            in.read(reinterpret_cast<char*>(&num_filters), sizeof(int));
-            auto& filters = conv->getFilters();
-            for (auto& filter : filters) {
-                if (!readTensor(in, filter)) return false;
+            load_bytes(in, &num_filters);
+
+            for (auto& filter : conv->getFilters()) {
+                int c, h, w;
+                load_bytes(in, &c); load_bytes(in, &h); load_bytes(in, &w);
+                for (int i = 0; i < filter.size(); ++i) {
+                    load_bytes(in, &filter(i));
+                }
             }
 
             int num_biases;
-            in.read(reinterpret_cast<char*>(&num_biases), sizeof(int));
-            auto& biases = conv->getBiases();
-            in.read(reinterpret_cast<char*>(biases.data()), num_biases * sizeof(float));
-            continue;
-        }
+            load_bytes(in, &num_biases);
+            load_bytes(in, conv->getBiases().data(), num_biases);
+        } 
+        else if (auto fc = dynamic_cast<FCLayer*>(layer.get())) {
+            int rows, cols;
+            load_bytes(in, &rows); load_bytes(in, &cols);
+            load_bytes(in, fc->getWeightsMutable().data(), rows * cols);
 
-        // Handle Fully Connected Layer
-        auto fc = dynamic_cast<FCLayer*>(layer.get());
-        if (fc) {
-            if (!readEigenMatrix(in, fc->getWeightsMutable())) return false;
-            if (!readEigenVector(in, fc->getBiasMutable())) return false;
-            continue;
+            int b_size;
+            load_bytes(in, &b_size);
+            load_bytes(in, fc->getBiasMutable().data(), b_size);
         }
     }
-
-    in.close();
-    std::cout << "[Serializer] Successfully loaded weights from " << filepath << std::endl;
     return true;
 }
