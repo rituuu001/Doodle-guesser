@@ -4,90 +4,21 @@
 #include <fstream>
 #include <iostream>
 
-
-// Helper: Save/Load standard Tensor
-static void writeTensor(std::ofstream& out, const Tensor& tensor) {
-    int c = tensor.getChannels();
-    int h = tensor.getHeight();
-    int w = tensor.getWidth();
-
-    out.write(reinterpret_cast<const char*>(&c), sizeof(int));
-    out.write(reinterpret_cast<const char*>(&h), sizeof(int));
-    out.write(reinterpret_cast<const char*>(&w), sizeof(int));
-
-    for (int i = 0; i < tensor.size(); ++i) {
-        float val = tensor[i];
-        out.write(reinterpret_cast<const char*>(&val), sizeof(float));
-    }
+template <typename T>
+static void save_bytes(std::ofstream& out, const T* data, size_t count = 1) {
+    out.write(reinterpret_cast<const char*>(data), count * sizeof(T));
 }
 
-static bool readTensor(std::ifstream& in, Tensor& tensor) {
-    int c, h, w;
-    in.read(reinterpret_cast<char*>(&c), sizeof(int));
-    in.read(reinterpret_cast<char*>(&h), sizeof(int));
-    in.read(reinterpret_cast<char*>(&w), sizeof(int));
-
-    if (c != tensor.getChannels() || h != tensor.getHeight() || w != tensor.getWidth()) {
-        std::cerr << "[Serializer Error] Tensor shape mismatch!\n";
-        return false;
-    }
-
-    for (int i = 0; i < tensor.size(); ++i) {
-        float val;
-        in.read(reinterpret_cast<char*>(&val), sizeof(float));
-        tensor[i] = val;
-    }
-    return in.good();
-}
-
-// Helper: Save/Load Eigen Matrix (for FCLayer weights)
-static void writeEigenMatrix(std::ofstream& out, const Eigen::MatrixXf& mat) {
-    int rows = mat.rows();
-    int cols = mat.cols();
-    out.write(reinterpret_cast<const char*>(&rows), sizeof(int));
-    out.write(reinterpret_cast<const char*>(&cols), sizeof(int));
-    out.write(reinterpret_cast<const char*>(mat.data()), rows * cols * sizeof(float));
-}
-
-static bool readEigenMatrix(std::ifstream& in, Eigen::MatrixXf& mat) {
-    int rows, cols;
-    in.read(reinterpret_cast<char*>(&rows), sizeof(int));
-    in.read(reinterpret_cast<char*>(&cols), sizeof(int));
-
-    if (rows != mat.rows() || cols != mat.cols()) {
-        std::cerr << "[Serializer Error] Eigen Matrix shape mismatch!\n";
-        return false;
-    }
-
-    in.read(reinterpret_cast<char*>(mat.data()), rows * cols * sizeof(float));
-    return in.good();
-}
-
-// Helper: Save/Load Eigen Vector (for FCLayer biases)
-static void writeEigenVector(std::ofstream& out, const Eigen::VectorXf& vec) {
-    int size = vec.size();
-    out.write(reinterpret_cast<const char*>(&size), sizeof(int));
-    out.write(reinterpret_cast<const char*>(vec.data()), size * sizeof(float));
-}
-
-static bool readEigenVector(std::ifstream& in, Eigen::VectorXf& vec) {
-    int size;
-    in.read(reinterpret_cast<char*>(&size), sizeof(int));
-
-    if (size != vec.size()) {
-        std::cerr << "[Serializer Error] Eigen Vector size mismatch!\n";
-        return false;
-    }
-
-    in.read(reinterpret_cast<char*>(vec.data()), size * sizeof(float));
-    return in.good();
+template <typename T>
+static bool load_bytes(std::ifstream& in, T* data, size_t count = 1) {
+    return in.read(reinterpret_cast<char*>(data), count * sizeof(T)).good();
 }
 
 bool Serializer::save(const Network& net, const std::string& filepath) {
     std::ofstream out(filepath, std::ios::binary);
     if (!out.is_open()) return false;
 
-    uint32_t magic = 0x534E5731; // Unique binary header
+    uint32_t magic = 0x534E5731;
     save_bytes(out, &magic);
 
     for (const auto& layer : net.getLayers()) {
@@ -98,10 +29,7 @@ bool Serializer::save(const Network& net, const std::string& filepath) {
             for (const auto& filter : conv->getFilters()) {
                 int c = filter.getChannels(), h = filter.getHeight(), w = filter.getWidth();
                 save_bytes(out, &c); save_bytes(out, &h); save_bytes(out, &w);
-                for (int i = 0; i < filter.size(); ++i) {
-                    float val = filter(i);
-                    save_bytes(out, &val);
-                }
+                save_bytes(out, filter.getData().data(), filter.size());
             }
 
             int num_biases = conv->getBiases().size();
@@ -137,9 +65,7 @@ bool Serializer::load(Network& net, const std::string& filepath) {
             for (auto& filter : conv->getFilters()) {
                 int c, h, w;
                 load_bytes(in, &c); load_bytes(in, &h); load_bytes(in, &w);
-                for (int i = 0; i < filter.size(); ++i) {
-                    load_bytes(in, &filter(i));
-                }
+                if (!load_bytes(in, filter.getData().data(), filter.size())) return false;
             }
 
             int num_biases;
