@@ -11,7 +11,7 @@ abstract away: the forward pass, backpropagation, loss computation, and
 gradient-based optimization, all implemented by hand.
 
 
-[Doodle-Guesser demo](docs/Screenshot 2026-08-14 215012.png)
+![Doodle-Guesser demo](docs/demo.png)
 
 ## Overview
 
@@ -82,7 +82,7 @@ images):
   (validation accuracy peaks around epoch 16–18, after which the model
   begins to overfit)
 
- [Training curves](docs/cnntraining_and_validationaccuracy.png)
+ ![Training curves](docs/cnntraining_and_validationaccuracy.png)
 
 ## Libraries Required
 
