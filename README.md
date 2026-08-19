@@ -212,13 +212,8 @@ predictions).
 
 1. Google Creative Lab. (2017). *Quick, Draw! Dataset.*
    [github.com/googlecreativelab/quickdraw-dataset](https://github.com/googlecreativelab/quickdraw-dataset)
-2. LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). *Gradient-based
-   learning applied to document recognition.* Proceedings of the IEEE,
-   86(11), 2278–2324.
-3. Goodfellow, I., Bengio, Y., & Courville, A. (2016). *Deep Learning.*
-   MIT Press.
-4. Raylib Development Team. (2024). *Raylib 5.0 Architecture and
+2. Raylib Development Team. (2024). *Raylib 5.0 Architecture and
    Documentation.* [raylib.com](https://www.raylib.com)
-5. OpenCV Open Source Team. (2024). *OpenCV 4.x Reference Manual.*
+3. OpenCV Open Source Team. (2024). *OpenCV 4.x Reference Manual.*
    [docs.opencv.org](https://docs.opencv.org)
 
