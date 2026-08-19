@@ -11,7 +11,7 @@ abstract away: the forward pass, backpropagation, loss computation, and
 gradient-based optimization, all implemented by hand.
 
 
-![Doodle-Guesser demo](docs/Screenshot 2026-08-14 215012.png)
+[Doodle-Guesser demo](docs/Screenshot 2026-08-14 215012.png)
 
 ## Overview
 
